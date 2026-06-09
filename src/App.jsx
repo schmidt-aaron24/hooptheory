@@ -3625,7 +3625,7 @@ export default function HoopTheory(){
                   value={score.totals.ppg*score.assistMult} max={180} color={score.assistMult>=1?"#4ade80":"#f87171"}
                   note={score.assistMult<1?`${score.totals.apg.toFixed(1)} APG below 19 threshold`:null}/>
                 <StatBar label={`RPG${score.totals.rpg>50?" (capped at 50)":""}`} value={score.rebScore} max={50} color="#60a5fa"
-                  note={score.totals.rpg>48?`raw ${score.totals.rpg.toFixed(1)}`:null}/>
+                  note={score.totals.rpg>50?`raw ${score.totals.rpg.toFixed(1)}`:null}/>
                 <StatBar label="APG" value={score.totals.apg} max={40} color="#a78bfa"/>
                 <StatBar label={`SPG (×3 weight)${(score.totals.spg+score.totals.bpg)>=12?" ⭐":""}`} value={score.totals.spg} max={15} color="#f4a426"/>
                 <StatBar label="BPG (×3 weight)" value={score.totals.bpg} max={15} color="#fb923c"/>
@@ -3634,7 +3634,7 @@ export default function HoopTheory(){
               <div style={{background:"#0a1520",border:"1px solid #1a2535",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
                 <div style={{color:"#94b4c8",fontSize:8,letterSpacing:3,marginBottom:10}}>ANALYSIS</div>
                 {score.assistMult<0.97&&<div style={{color:"#fbbf24",fontSize:12,marginBottom:8,lineHeight:1.6}}>⚠️ Low assists ({score.totals.apg.toFixed(1)} APG) hurt scoring efficiency — need 19+ for neutral, 23+ for bonus.</div>}
-                {score.totals.rpg>48&&<div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>📉 {score.totals.rpg.toFixed(1)} RPG exceeded the 48-board threshold — diminishing returns kicked in.</div>}
+                {score.totals.rpg>50&&<div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>📉 {score.totals.rpg.toFixed(1)} RPG exceeded the 50-board threshold — diminishing returns kicked in.</div>}
                 {(()=>{
                 const defTotal = score.totals.spg + score.totals.bpg;
                 if(defTotal >= 14.0) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Historically dominant defense — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG. One of the all-time great defensive rosters.</div>;
