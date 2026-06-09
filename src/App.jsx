@@ -3115,7 +3115,7 @@ export default function HoopTheory(){
                   "Vercel — hosting and content delivery.",
                   "Resend — transactional email (magic links and account confirmations)."
                 ]],
-                ["Your Choices & Rights",[
+                ["Your Choices and Rights",[
                   "Play anonymously — you can use Hoop Theory without an account and nothing is saved to a profile.",
                   "Delete your account — to request deletion of your account and data, email privacy@hooptheory.app.",
                   "Clear local data — clearing your browser storage removes cached settings."
