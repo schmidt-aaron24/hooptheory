@@ -3684,50 +3684,87 @@ export default function HoopTheory(){
           )}
         </div>
       )}
-      {showWhatIf&&(
+      {showWhatIf&&score&&(
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:200,overflowY:"auto",padding:"24px 16px"}}>
           <div style={{maxWidth:520,margin:"0 auto"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
               <div style={{color:"#a78bfa",fontSize:18,fontWeight:800,letterSpacing:1}}>WHAT IF?</div>
               <button onClick={function(){setShowWhatIf(false);}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>X</button>
             </div>
-            <div style={{color:"#8899aa",fontSize:12,marginBottom:16,lineHeight:1.6}}>Here is what else was available each round when you made your pick.</div>
-            {draftHistory.map(function(round){
-              return React.createElement('div', {key:round.round, style:{background:"#0f1923",borderRadius:14,padding:16,marginBottom:12,border:"1px solid #1e2f40"}},
-                React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
-                  React.createElement('div', {style:{color:"#8899aa",fontSize:10,letterSpacing:1}}, "ROUND " + round.round + " — " + round.team + " " + round.decade),
-                  null
-                ),
-                React.createElement('div', {style:{marginBottom:10}},
-                  React.createElement('div', {style:{color:"#60a5fa",fontSize:10,letterSpacing:1,marginBottom:6}}, "YOU PICKED"),
-                  React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#1a2d42",borderRadius:10,padding:"10px 12px"}},
-                    React.createElement('div', null,
-                      React.createElement('div', {style:{color:"#fff",fontSize:13,fontWeight:700}}, round.picked.name),
-                      React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, round.picked.teamShort + " · " + round.picked.decade)
-                    ),
-                    React.createElement('div', {style:{textAlign:"right"}},
-                      React.createElement('div', {style:{color:"#f4a426",fontSize:13,fontWeight:700}}, round.picked.ppg + " pts"),
-                      React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, round.picked.rpg + "reb " + round.picked.apg + "ast")
-                    )
-                  )
-                ),
-                round.alternatives.length > 0 && React.createElement('div', null,
-                  React.createElement('div', {style:{color:"#a78bfa",fontSize:10,letterSpacing:1,marginBottom:6}}, "ALSO AVAILABLE"),
-                  round.alternatives.map(function(alt, i){
-                    return React.createElement('div', {key:i, style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0a1520",borderRadius:10,padding:"10px 12px",marginBottom:6,border:"1px solid #a78bfa20"}},
+            <div style={{color:"#8899aa",fontSize:12,marginBottom:20,lineHeight:1.6}}>A round-by-round breakdown of your picks and what you could have done differently.</div>
+            {(function(){
+              // Figure out which rounds had a strictly better alternative
+              var anyMissed = false;
+              var roundEls = draftHistory.map(function(round){
+                // Find the best alternative that would have improved the weakest stat
+                var totals = score.totals;
+                var weakestStat = "ppg";
+                var weakestGap = Infinity;
+                var statTargets = {ppg:130, rpg:43, apg:23};
+                Object.keys(statTargets).forEach(function(s){
+                  var gap = statTargets[s] - totals[s];
+                  if(gap < weakestGap){ weakestGap = gap; weakestStat = s; }
+                });
+
+                // Find best alt for the weakest stat
+                var bestAlt = null;
+                var bestGain = 0;
+                round.alternatives.forEach(function(alt){
+                  var gain = alt[weakestStat] - round.picked[weakestStat];
+                  if(gain > bestGain){ bestGain = gain; bestAlt = alt; }
+                });
+
+                var hasBetter = bestAlt && bestGain > 1;
+                if(hasBetter) anyMissed = true;
+
+                // Estimate win impact by swapping that player
+                var estWinDiff = 0;
+                if(hasBetter){
+                  var altRoster = roster.map(function(r){ return r.player.name===round.picked.name ? {...r, player:bestAlt} : r; });
+                  if(altRoster.length===5){
+                    var altScore = scoreTeam(altRoster);
+                    estWinDiff = altScore ? altScore.wins - score.wins : 0;
+                  }
+                }
+
+                return {round, hasBetter, bestAlt, bestGain, weakestStat, estWinDiff};
+              });
+
+              var statLabel = {ppg:"scoring", rpg:"rebounding", apg:"assists", spg:"steals", bpg:"blocks"};
+
+              return React.createElement('div', null,
+                roundEls.map(function(item){
+                  return React.createElement('div', {key:item.round.round, style:{background:"#0f1923",borderRadius:14,padding:16,marginBottom:12,border:"1px solid " + (item.hasBetter?"#a78bfa30":"#1e2f40")}},
+                    React.createElement('div', {style:{color:"#8899aa",fontSize:10,letterSpacing:1,marginBottom:10}}, "ROUND " + item.round.round + " — " + item.round.team + " " + item.round.decade),
+                    React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:item.hasBetter?10:0}},
                       React.createElement('div', null,
-                        React.createElement('div', {style:{color:"#ccd9e8",fontSize:13,fontWeight:600}}, alt.name),
-                        React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, alt.teamShort + " · " + alt.decade)
+                        React.createElement('div', {style:{color:"#fff",fontSize:13,fontWeight:700}}, item.round.picked.name),
+                        React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, item.round.picked.ppg + " pts · " + item.round.picked.rpg + " reb · " + item.round.picked.apg + " ast · " + item.round.picked.spg + " stl · " + item.round.picked.bpg + " blk")
                       ),
-                      React.createElement('div', {style:{textAlign:"right"}},
-                        React.createElement('div', {style:{color:"#a78bfa",fontSize:13,fontWeight:700}}, alt.ppg + " pts"),
-                        React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, alt.rpg + "reb " + alt.apg + "ast")
+                      !item.hasBetter && React.createElement('div', {style:{background:"#4ade8020",border:"1px solid #4ade8040",borderRadius:20,padding:"3px 10px",color:"#4ade80",fontSize:10,fontWeight:700}}, "BEST PICK")
+                    ),
+                    item.hasBetter && React.createElement('div', {style:{background:"#0a1520",borderRadius:10,padding:"12px 14px",border:"1px solid #a78bfa30"}},
+                      React.createElement('div', {style:{color:"#a78bfa",fontSize:10,letterSpacing:1,marginBottom:6}}, "BETTER OPTION"),
+                      React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+                        React.createElement('div', null,
+                          React.createElement('div', {style:{color:"#ccd9e8",fontSize:13,fontWeight:600}}, item.bestAlt.name),
+                          React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, item.bestAlt.ppg + " pts · " + item.bestAlt.rpg + " reb · " + item.bestAlt.apg + " ast · " + item.bestAlt.spg + " stl · " + item.bestAlt.bpg + " blk")
+                        )
+                      ),
+                      React.createElement('div', {style:{color:"#8899aa",fontSize:11,lineHeight:1.6}},
+                        item.bestAlt.name + " would have added +" + item.bestGain.toFixed(1) + " to your " + statLabel[item.weakestStat] + ".",
+                        item.estWinDiff > 0 && React.createElement('span', {style:{color:"#4ade80",fontWeight:700}}, " Estimated impact: +" + item.estWinDiff + " wins.")
                       )
-                    );
-                  })
+                    )
+                  );
+                }),
+                !anyMissed && React.createElement('div', {style:{background:"linear-gradient(135deg,#0f2a1a,#1a3a2a)",borderRadius:14,padding:24,textAlign:"center",border:"1px solid #4ade8040",marginTop:8}},
+                  React.createElement('div', {style:{fontSize:32,marginBottom:12}}, "🏆"),
+                  React.createElement('div', {style:{color:"#4ade80",fontSize:16,fontWeight:800,marginBottom:8}}, "Optimal Draft"),
+                  React.createElement('div', {style:{color:"#94b4c8",fontSize:13,lineHeight:1.6}}, "You picked the best available player in every single round. The results are on you now — keep building.")
                 )
               );
-            })}
+            })()}
           </div>
         </div>
       )}
