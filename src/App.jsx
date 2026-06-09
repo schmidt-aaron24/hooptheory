@@ -2813,6 +2813,8 @@ export default function HoopTheory(){
   const [profile,setProfile]=useState(null);
   const [recentGames,setRecentGames]=useState([]);
   const [showBestTeam,setShowBestTeam]=useState(false);
+  const [showMenu,setShowMenu]=useState(false);
+  const [showPrivacy,setShowPrivacy]=useState(false);
   const [profileTab,setProfileTab]=useState("profile");
   const [leaderboard,setLeaderboard]=useState([]);
   const [lbLoading,setLbLoading]=useState(false);
