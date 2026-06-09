@@ -2815,6 +2815,8 @@ export default function HoopTheory(){
   const [showBestTeam,setShowBestTeam]=useState(false);
   const [showMenu,setShowMenu]=useState(false);
   const [showPrivacy,setShowPrivacy]=useState(false);
+  const [draftHistory,setDraftHistory]=useState([]);
+  const [showWhatIf,setShowWhatIf]=useState(false);
   const [profileTab,setProfileTab]=useState("profile");
   const [leaderboard,setLeaderboard]=useState([]);
   const [lbLoading,setLbLoading]=useState(false);
@@ -2959,6 +2961,18 @@ export default function HoopTheory(){
 
   function confirmPick(player,pos){
     const newRoster=[...roster,{player,filledAs:pos}];
+    // Track what else was available this round
+    const allAvailable = getPlayersForSlot(currentSlot.team, currentSlot.decade)
+      .filter(p=>!usedNames.has(p.name) && p.name !== player.name)
+      .sort((a,b)=>b.ppg-a.ppg)
+      .slice(0,2);
+    setDraftHistory(prev=>[...prev,{
+      round: roster.length+1,
+      team: currentSlot.team,
+      decade: currentSlot.decade,
+      picked: player,
+      alternatives: allAvailable
+    }]);
     setRoster(newRoster);
     const aliases = NAME_ALIASES[player.name] || [];
     setUsedNames(prev=>new Set([...prev,player.name,...aliases]));
@@ -2985,6 +2999,7 @@ export default function HoopTheory(){
     setRoster([]);setScore(null);setCurrentSlot(null);setRerollDecade(1);setRerollTeam(1);
     setPhase("idle");setShareMsg("");setSelectedIdx(null);setPendingPlayer(null);
     setUsedNames(new Set());setFilter("All");setSearch("");setSortBy("PPG");
+    setDraftHistory([]);setShowWhatIf(false);
   }
   const [showShareCard, setShowShareCard] = useState(false);
 
@@ -3659,10 +3674,64 @@ export default function HoopTheory(){
                   BUILD ANOTHER
                 </button>
               </div>
+              {draftHistory.length>0&&(
+                <button onClick={function(){setShowWhatIf(true);}}
+                  style={{width:"100%",background:"none",border:"1px solid #a78bfa50",borderRadius:14,padding:12,color:"#a78bfa",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1,marginTop:8}}>
+                  WHAT IF? SEE YOUR ALTERNATIVES
+                </button>
+              )}
             </div>
           )}
         </div>
       )}
+      {showWhatIf&&(
+        <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:200,overflowY:"auto",padding:"24px 16px"}}>
+          <div style={{maxWidth:520,margin:"0 auto"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <div style={{color:"#a78bfa",fontSize:18,fontWeight:800,letterSpacing:1}}>WHAT IF?</div>
+              <button onClick={function(){setShowWhatIf(false);}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>X</button>
+            </div>
+            <div style={{color:"#8899aa",fontSize:12,marginBottom:16,lineHeight:1.6}}>Here is what else was available each round when you made your pick.</div>
+            {draftHistory.map(function(round){
+              return React.createElement('div', {key:round.round, style:{background:"#0f1923",borderRadius:14,padding:16,marginBottom:12,border:"1px solid #1e2f40"}},
+                React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+                  React.createElement('div', {style:{color:"#8899aa",fontSize:10,letterSpacing:1}}, "ROUND " + round.round + " — " + round.team + " " + round.decade),
+                  null
+                ),
+                React.createElement('div', {style:{marginBottom:10}},
+                  React.createElement('div', {style:{color:"#60a5fa",fontSize:10,letterSpacing:1,marginBottom:6}}, "YOU PICKED"),
+                  React.createElement('div', {style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#1a2d42",borderRadius:10,padding:"10px 12px"}},
+                    React.createElement('div', null,
+                      React.createElement('div', {style:{color:"#fff",fontSize:13,fontWeight:700}}, round.picked.name),
+                      React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, round.picked.teamShort + " · " + round.picked.decade)
+                    ),
+                    React.createElement('div', {style:{textAlign:"right"}},
+                      React.createElement('div', {style:{color:"#f4a426",fontSize:13,fontWeight:700}}, round.picked.ppg + " pts"),
+                      React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, round.picked.rpg + "reb " + round.picked.apg + "ast")
+                    )
+                  )
+                ),
+                round.alternatives.length > 0 && React.createElement('div', null,
+                  React.createElement('div', {style:{color:"#a78bfa",fontSize:10,letterSpacing:1,marginBottom:6}}, "ALSO AVAILABLE"),
+                  round.alternatives.map(function(alt, i){
+                    return React.createElement('div', {key:i, style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0a1520",borderRadius:10,padding:"10px 12px",marginBottom:6,border:"1px solid #a78bfa20"}},
+                      React.createElement('div', null,
+                        React.createElement('div', {style:{color:"#ccd9e8",fontSize:13,fontWeight:600}}, alt.name),
+                        React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, alt.teamShort + " · " + alt.decade)
+                      ),
+                      React.createElement('div', {style:{textAlign:"right"}},
+                        React.createElement('div', {style:{color:"#a78bfa",fontSize:13,fontWeight:700}}, alt.ppg + " pts"),
+                        React.createElement('div', {style:{color:"#8899aa",fontSize:10}}, alt.rpg + "reb " + alt.apg + "ast")
+                      )
+                    );
+                  })
+                )
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       {phase==="idle"&&(
         <div style={{padding:"20px 16px",textAlign:"center",borderTop:"1px solid #ffffff08",marginTop:8}}>
