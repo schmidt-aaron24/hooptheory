@@ -2987,6 +2987,8 @@ export default function HoopTheory(){
     setUsedNames(new Set());setFilter("All");setSearch("");setSortBy("PPG");
   }
   const [showShareCard, setShowShareCard] = useState(false);
+  const shareCardRef = useRef(null);
+  const [savingImage, setSavingImage] = useState(false);
 
   async function handleShare(){
     setShowShareCard(true);
@@ -3310,7 +3312,7 @@ export default function HoopTheory(){
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{width:"100%",maxWidth:400}}>
             {/* Share Card Preview */}
-            <div style={{background:"linear-gradient(135deg,#0f1923 0%,#1a2535 100%)",borderRadius:16,padding:24,marginBottom:12,border:"1px solid #f4a42640"}}>
+            <div ref={shareCardRef} id="hoop-share-card" style={{background:"linear-gradient(135deg,#0f1923 0%,#1a2535 100%)",borderRadius:16,padding:24,marginBottom:12,border:"1px solid #f4a42640"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
                 <div>
                   <div style={{color:"#f4a426",fontSize:11,letterSpacing:3,fontWeight:700}}>HOOP THEORY</div>
@@ -3348,6 +3350,30 @@ export default function HoopTheory(){
               <button onClick={()=>doShare("reddit")} style={{background:"#ff4500",border:"none",borderRadius:12,padding:"12px 8px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>🟠 Reddit</button>
               <button onClick={()=>doShare("native")} style={{background:"#1e2a3a",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 8px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>📤 More...</button>
               <button onClick={()=>doShare("copy")} style={{background:"#1e2a3a",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 8px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>📋 Copy</button>
+            </div>
+            <button onClick={async function(){
+              setSavingImage(true);
+              try {
+                const el = document.getElementById("hoop-share-card");
+                const h2c = (await import("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js")).default;
+                const canvas = await h2c(el, {backgroundColor:null, scale:2, useCORS:true});
+                const dataUrl = canvas.toDataURL("image/png");
+                if(navigator.share && navigator.canShare && navigator.canShare({files:[]})){
+                  const blob = await (await fetch(dataUrl)).blob();
+                  const file = new File([blob], "hooptheory.png", {type:"image/png"});
+                  await navigator.share({files:[file], title:"Hoop Theory"});
+                } else {
+                  const a = document.createElement("a");
+                  a.href = dataUrl;
+                  a.download = "hooptheory-" + score.wins + "-" + score.losses + ".png";
+                  a.click();
+                }
+              } catch(e){ console.error(e); }
+              setSavingImage(false);
+            }} style={{width:"100%",background:"linear-gradient(135deg,#f4a426,#e8891a)",border:"none",borderRadius:12,padding:"13px 8px",color:"#000",fontSize:12,fontWeight:800,cursor:"pointer",marginBottom:8,letterSpacing:1}}>
+              {savingImage ? "SAVING..." : "💾 SAVE IMAGE"}
+            </button>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
             </div>
             <button onClick={()=>setShowShareCard(false)} style={{width:"100%",background:"transparent",border:"1px solid #2a3a4a",borderRadius:12,padding:"10px",color:"#8899aa",fontSize:12,cursor:"pointer"}}>Cancel</button>
           </div>
