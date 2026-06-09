@@ -3364,7 +3364,7 @@ export default function HoopTheory(){
               </div>
               {creatingShare && <div style={{textAlign:"center",color:"#8899aa",fontSize:11,marginTop:10}}>Creating share link...</div>}
               {shareUrl && <div style={{textAlign:"center",marginTop:10}}>
-                <div style={{background:"#060d14",borderRadius:8,padding:"8px 12px",color:"#60a5fa",fontSize:11,wordBreak:"break-all"}}>{shareUrl}</div>
+                <a href={shareUrl} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#060d14",borderRadius:8,padding:"8px 12px",color:"#60a5fa",fontSize:11,wordBreak:"break-all",textDecoration:"none"}}>{shareUrl}</a>
               </div>}
             </div>
 
