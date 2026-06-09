@@ -3051,7 +3051,7 @@ export default function HoopTheory(){
           </button>
           <button onClick={()=>setShowMenu(true)}
             style={{background:"none",border:"1px solid #ffffff20",color:"#fff",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:16,lineHeight:1}}>
-            ☰
+            MENU
           </button>
         </div>
       </div>
@@ -3069,16 +3069,16 @@ export default function HoopTheory(){
             </div>
             <div style={{flex:1,padding:"16px 0"}}>
               {[
-                {icon:"📋",label:"Rules",action:()=>{setPhase("rules");setShowMenu(false);}},
-                {icon:"👤",label:"Profile",action:()=>{user?setShowProfile(true):setShowAuth(true);setShowMenu(false);}},
-                {icon:"☕",label:"Support Us",action:()=>{window.open("https://ko-fi.com/playhooptheory","_blank");setShowMenu(false);}},
-                {icon:"🔒",label:"Privacy Policy",action:()=>{setShowPrivacy(true);setShowMenu(false);}},
+                {icon:"",label:"Rules",action:()=>{setPhase("rules");setShowMenu(false);}},
+                {icon:"",label:"Profile",action:()=>{user?setShowProfile(true):setShowAuth(true);setShowMenu(false);}},
+                {icon:"",label:"Support Us",action:()=>{window.open("https://ko-fi.com/playhooptheory","_blank");setShowMenu(false);}},
+                {icon:"",label:"Privacy Policy",action:()=>{setShowPrivacy(true);setShowMenu(false);}},
               ].map(({icon,label,action})=>(
                 <button key={label} onClick={action}
                   style={{width:"100%",background:"none",border:"none",padding:"16px 20px",display:"flex",alignItems:"center",gap:14,cursor:"pointer",color:"#fff",fontSize:14,fontWeight:600,textAlign:"left",borderBottom:"1px solid #ffffff08"}}>
                   <span style={{fontSize:18,minWidth:24}}>{icon}</span>
                   {label}
-                  <span style={{marginLeft:"auto",color:"#4a6a8a",fontSize:12}}>›</span>
+                  <span style={{marginLeft:"auto",color:"#4a6a8a",fontSize:12}}>&rsaquo;</span>
                 </button>
               ))}
             </div>
@@ -3116,13 +3116,13 @@ export default function HoopTheory(){
                   "Resend — transactional email (magic links and account confirmations)."
                 ]],
                 ["Your Choices & Rights",[
-                  "Play anonymously — you can use Hoop Theory without an account; nothing is saved to a profile.",
+                  "Play anonymously — you can use Hoop Theory without an account and nothing is saved to a profile.",
                   "Delete your account — to request deletion of your account and data, email privacy@hooptheory.app.",
                   "Clear local data — clearing your browser storage removes cached settings."
                 ]],
                 ["Data Retention",["We keep account and game data for as long as your account is active. When you delete your account, we remove your personal data within a reasonable period."]],
                 ["Children's Privacy",["Hoop Theory is not directed to children under 13, and we do not knowingly collect their personal information."]],
-                ["Changes to This Policy",["We may update this policy as the game evolves. We'll update the date above when we do."]],
+                ["Changes to This Policy",["We may update this policy as the game evolves. We will update the date above when we do."]],
               ].map(([title,items])=>(
                 <div key={title} style={{marginBottom:20}}>
                   <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:8,paddingBottom:8,borderBottom:"1px solid #1e2f40"}}>{title}</div>
