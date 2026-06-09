@@ -2985,18 +2985,43 @@ export default function HoopTheory(){
     setRoster([]);setScore(null);setCurrentSlot(null);setRerollDecade(1);setRerollTeam(1);
     setPhase("idle");setShareMsg("");setSelectedIdx(null);setPendingPlayer(null);
     setUsedNames(new Set());setFilter("All");setSearch("");setSortBy("PPG");
+    setShareUrl(null);
   }
   const [showShareCard, setShowShareCard] = useState(false);
   const shareCardRef = useRef(null);
   const [savingImage, setSavingImage] = useState(false);
+  const [shareUrl, setShareUrl] = useState(null);
+  const [creatingShare, setCreatingShare] = useState(false);
 
   async function handleShare(){
     setShowShareCard(true);
+    setShareUrl(null);
+    setCreatingShare(true);
+    try {
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          wins: score.wins,
+          losses: score.losses,
+          grade: score.grade,
+          grade_label: score.gradeLabel,
+          ovr: score.ovr,
+          roster: roster.map(r=>({filledAs:r.filledAs,player:{name:r.player.name,teamShort:r.player.teamShort,decade:r.player.decade,ppg:r.player.ppg,rpg:r.player.rpg,apg:r.player.apg}})),
+          user_id: user ? user.id : null,
+          username: profile ? profile.username : null,
+        })
+      });
+      const data = await res.json();
+      if(data.id) setShareUrl("https://hooptheory.app/share/" + data.id);
+    } catch(e){ console.error(e); }
+    setCreatingShare(false);
   }
 
   async function doShare(platform){
+    const url = shareUrl || "https://hooptheory.app";
     const names=roster.map(r=>`${r.player.name} (${r.player.teamShort} · ${r.player.decade})`).join("\n");
-    const text=`🏀 Hoop Theory: ${score.wins}-${score.losses} | ${score.gradeLabel} | OVR ${score.ovr}\n${names}\n\nCan you beat me? Play Hoop Theory!`;
+    const text=`🏀 Hoop Theory: ${score.wins}-${score.losses} | ${score.gradeLabel} | OVR ${score.ovr}\n${names}\n\nCan you beat me? ${url}`;
     if(platform==="native"){
       if(navigator.share){
         try {
@@ -3008,10 +3033,10 @@ export default function HoopTheory(){
           }
         }
       } else {
-        navigator.clipboard.writeText(text).then(()=>setShareMsg("Copied!")).catch(()=>setShareMsg("Failed"));
+        navigator.clipboard.writeText(shareUrl||text).then(()=>setShareMsg("Copied!")).catch(()=>setShareMsg("Failed"));
       }
     } else if(platform==="copy"){
-      navigator.clipboard.writeText(text).then(()=>setShareMsg("Copied!")).catch(()=>setShareMsg("Failed"));
+      navigator.clipboard.writeText(shareUrl||text).then(()=>setShareMsg("Copied!")).catch(()=>setShareMsg("Failed"));
     } else if(platform==="twitter"){
       const tweet = `🏀 Hoop Theory: ${score.wins}-${score.losses} | ${score.gradeLabel} | OVR ${score.ovr}\n${roster.map(r=>r.player.name).join(" · ")}\n\nCan you beat me?`;
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, "_blank");
@@ -3338,6 +3363,10 @@ export default function HoopTheory(){
                 <div style={{color:"#8899aa",fontSize:10}}>Can you go 82-0?</div>
                 <div style={{color:"#f4a426",fontSize:10,fontWeight:700}}>hooptheory.app</div>
               </div>
+              {creatingShare && <div style={{textAlign:"center",color:"#8899aa",fontSize:11,marginTop:10}}>Creating share link...</div>}
+              {shareUrl && <div style={{textAlign:"center",marginTop:10}}>
+                <div style={{background:"#060d14",borderRadius:8,padding:"8px 12px",color:"#60a5fa",fontSize:11,wordBreak:"break-all"}}>{shareUrl}</div>
+              </div>}
             </div>
 
             {/* Share Buttons */}
