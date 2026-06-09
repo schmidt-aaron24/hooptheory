@@ -2630,8 +2630,7 @@ const INVALID_COMBOS = new Set([
   "Cleveland Cavaliers|1960s","Portland Trail Blazers|1960s","San Antonio Spurs|1960s","Utah Jazz|1960s",
 ]);
 
-const RARE_FRANCHISES = new Set([
-  "Boston Celtics|1960s","Golden State Warriors|1960s",
+const RARE_FRANCHISES = new Set(["Boston Celtics|1960s","Golden State Warriors|1960s",
   "Sacramento Kings|1960s","Los Angeles Lakers|1960s","Philadelphia 76ers|1960s",
   "Milwaukee Bucks|1970s","Sacramento Kings|1970s",
   "Los Angeles Lakers|1980s","Boston Celtics|1980s",
@@ -2640,11 +2639,13 @@ const RARE_FRANCHISES = new Set([
   "Golden State Warriors|2010s","Miami Heat|2010s","Oklahoma City Thunder|2010s",
   "San Antonio Spurs|2010s","Cleveland Cavaliers|2010s",
   "Golden State Warriors|2020s","Dallas Mavericks|2020s","Denver Nuggets|2020s",
-  "Milwaukee Bucks|2020s","Boston Celtics|2020s",
+  "Milwaukee Bucks|2020s","Boston Celtics|2020s",,
+  "Chicago Bulls|1980s",
+  "Los Angeles Lakers|1990s",
+  "Milwaukee Bucks|1960s"
 ]);
 
-const UNCOMMON_FRANCHISES = new Set([
-  "Washington Wizards|1960s",
+const UNCOMMON_FRANCHISES = new Set(["Washington Wizards|1960s",
   "Los Angeles Lakers|1970s","Philadelphia 76ers|1970s","Golden State Warriors|1970s",
   "Portland Trail Blazers|1970s","New York Knicks|1970s","Washington Wizards|1970s",
   "Detroit Pistons|1980s","Philadelphia 76ers|1980s","Houston Rockets|1980s",
@@ -2655,13 +2656,24 @@ const UNCOMMON_FRANCHISES = new Set([
   "Minnesota Timberwolves|2000s","Boston Celtics|2000s","Philadelphia 76ers|2000s",
   "Houston Rockets|2010s","New Orleans Pelicans|2010s","Portland Trail Blazers|2010s","Dallas Mavericks|2010s",
   "Los Angeles Lakers|2020s","Oklahoma City Thunder|2020s","Philadelphia 76ers|2020s",
-  "Indiana Pacers|2020s","Minnesota Timberwolves|2020s",
+  "Indiana Pacers|2020s","Minnesota Timberwolves|2020s",,
+  "Milwaukee Bucks|2010s",
+  "Atlanta Hawks|1980s",
+  "Atlanta Hawks|1990s",
+  "Brooklyn Nets|2010s",
+  "Brooklyn Nets|2020s",
+  "Denver Nuggets|2000s",
+  "Houston Rockets|1960s",
+  "Minnesota Timberwolves|1990s",
+  "Phoenix Suns|2010s",
+  "Phoenix Suns|2020s",
+  "Los Angeles Clippers|2010s"
 ]);
 
 function getFranchiseWeight(team, decade) {
   const key = team + "|" + decade;
   if (RARE_FRANCHISES.has(key)) return 2;
-  if (UNCOMMON_FRANCHISES.has(key)) return 10;
+  if (UNCOMMON_FRANCHISES.has(key)) return 6;
   return 45;
 }
 
@@ -2716,7 +2728,7 @@ function scoreTeam(roster) {
   ].filter(Boolean).length;
   const eliteBonus = eliteCount>=4?4 : eliteCount>=3?2 : 0;
 
-  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/255, 1.125)));
+  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/258, 1.125)));
   const wins = Math.min(82, rawWins+hofBonus+eliteBonus);
   const losses = 82-wins;
   const grade = wins>=82?"S":wins>=70?"A":wins>=60?"B":wins>=50?"C":wins>=40?"D":"F";
