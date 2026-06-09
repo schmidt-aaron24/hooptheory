@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef } from "react";
+import { supabase } from "./supabase";
 
 const HOF_PLAYERS = new Set([
   "Wilt Chamberlain","Bill Russell","Oscar Robertson","Jerry West","Elgin Baylor",
@@ -2812,45 +2813,65 @@ export default function HoopTheory(){
   const [profile,setProfile]=useState(null);
   const [recentGames,setRecentGames]=useState([]);
   const [showBestTeam,setShowBestTeam]=useState(false);
+  const [user,setUser]=useState(null);
+  const [showAuth,setShowAuth]=useState(false);
+  const [authEmail,setAuthEmail]=useState("");
+  const [authMsg,setAuthMsg]=useState("");
 
   const gradeColor={S:"#f4a426",A:"#4ade80",B:"#60a5fa",C:"#a78bfa",D:"#fb923c",F:"#f87171"};
 
   useEffect(()=>{
-    async function loadProfile(){
-      try {
-        const p = await window.storage.get('ht_profile');
-        if(p) setProfile(JSON.parse(p.value));
-        const g = await window.storage.get('ht_games');
-        if(g) setRecentGames(JSON.parse(g.value));
-      } catch(e){}
-    }
-    loadProfile();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if(session?.user) loadUserProfile(session.user.id);
+      else { setProfile(null); setRecentGames([]); }
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if(session?.user) loadUserProfile(session.user.id);
+    });
+    return () => subscription.unsubscribe();
   },[]);
 
-  async function saveResult(scoreData, rosterData){
+  async function loadUserProfile(userId){
     try {
-      const existingP = await window.storage.get('ht_profile').catch(()=>null);
-      const existing = existingP ? JSON.parse(existingP.value) : {gamesPlayed:0, bestWins:0, bestOvr:0, bestTeam:null};
-      const newProfile = {
-        gamesPlayed: (existing.gamesPlayed||0) + 1,
-        bestWins: Math.max(existing.bestWins||0, scoreData.wins),
-        bestOvr: Math.max(existing.bestOvr||0, scoreData.ovr),
-        bestTeam: (scoreData.wins > (existing.bestWins||0)) ? {roster: rosterData.map(r=>({filledAs:r.filledAs,player:{name:r.player.name,teamShort:r.player.teamShort,decade:r.player.decade,ppg:r.player.ppg,rpg:r.player.rpg,apg:r.player.apg,spg:r.player.spg,bpg:r.player.bpg}})), score:{wins:scoreData.wins,losses:scoreData.losses,grade:scoreData.grade,gradeLabel:scoreData.gradeLabel,ovr:scoreData.ovr}, date: new Date().toLocaleDateString()} : existing.bestTeam,
-      };
-      await window.storage.set('ht_profile', JSON.stringify(newProfile));
-      setProfile(newProfile);
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', userId).single();
+      if(prof) setProfile(prof);
+      const { data: games } = await supabase.from('games').select('*').eq('user_id', userId).order('created_at',{ascending:false}).limit(20);
+      if(games) setRecentGames(games);
+    } catch(e){ console.error('Load profile error', e); }
+  }
 
-      const existingG = await window.storage.get('ht_games').catch(()=>null);
-      const games = existingG ? JSON.parse(existingG.value) : [];
-      const newGame = {
+  async function saveResult(scoreData, rosterData){
+    if(!user) return;
+    try {
+      const bestTeamData = {
+        roster: rosterData.map(r=>({filledAs:r.filledAs,player:{name:r.player.name,teamShort:r.player.teamShort,decade:r.player.decade,ppg:r.player.ppg,rpg:r.player.rpg,apg:r.player.apg,spg:r.player.spg,bpg:r.player.bpg}})),
+        score:{wins:scoreData.wins,losses:scoreData.losses,grade:scoreData.grade,gradeLabel:scoreData.gradeLabel,ovr:scoreData.ovr},
+        date: new Date().toLocaleDateString()
+      };
+      const existing = profile || {games_played:0, best_wins:0, best_ovr:0, best_team:null};
+      const newBestWins = Math.max(existing.best_wins||0, scoreData.wins);
+      const newBestOvr = Math.max(existing.best_ovr||0, scoreData.ovr);
+      const newBestTeam = scoreData.wins > (existing.best_wins||0) ? bestTeamData : existing.best_team;
+      const profileUpdate = {
+        id: user.id,
+        games_played: (existing.games_played||0) + 1,
+        best_wins: newBestWins,
+        best_ovr: newBestOvr,
+        best_team: newBestTeam,
+      };
+      const { data: updatedProfile } = await supabase.from('profiles').upsert(profileUpdate).select().single();
+      if(updatedProfile) setProfile(updatedProfile);
+      const gameRecord = {
+        user_id: user.id,
         wins: scoreData.wins, losses: scoreData.losses,
-        grade: scoreData.grade, gradeLabel: scoreData.gradeLabel,
-        ovr: scoreData.ovr, date: new Date().toLocaleDateString(),
+        grade: scoreData.grade, grade_label: scoreData.gradeLabel,
+        ovr: scoreData.ovr,
         roster: rosterData.map(r=>({name:r.player.name, teamShort:r.player.teamShort, decade:r.player.decade, pos:r.filledAs}))
       };
-      const updated = [newGame, ...games].slice(0,20);
-      await window.storage.set('ht_games', JSON.stringify(updated));
-      setRecentGames(updated);
+      const { data: newGame } = await supabase.from('games').insert(gameRecord).select().single();
+      if(newGame) setRecentGames(prev=>[newGame,...prev].slice(0,20));
     } catch(e){ console.error('Save error',e); }
   }
 
@@ -3019,9 +3040,9 @@ export default function HoopTheory(){
           <div style={{fontSize:8,color:"#94b4c8",letterSpacing:3}}>BALANCED ROSTER BUILDER</div>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <button onClick={()=>setShowProfile(true)}
+          <button onClick={()=>user ? setShowProfile(true) : setShowAuth(true)}
             style={{background:"none",border:"1px solid #60a5fa50",color:"#60a5fa",borderRadius:20,padding:"5px 14px",cursor:"pointer",fontSize:10,letterSpacing:1}}>
-            👤 PROFILE
+            {user ? "👤 PROFILE" : "🔑 SIGN IN"}
           </button>
           <button onClick={()=>setPhase(p=>p==="rules"?"idle":"rules")}
             style={{background:"none",border:"1px solid #f4a42650",color:"#f4a426",borderRadius:20,padding:"5px 14px",cursor:"pointer",fontSize:10,letterSpacing:1}}>
@@ -3029,6 +3050,45 @@ export default function HoopTheory(){
           </button>
         </div>
       </div>
+
+
+      {showAuth&&(
+        <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+          <div style={{background:"#1a2535",borderRadius:20,padding:24,maxWidth:380,width:"100%"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <div style={{color:"#f4a426",fontSize:16,fontWeight:700}}>SIGN IN</div>
+              <button onClick={()=>{setShowAuth(false);setAuthMsg("");}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{color:"#94b4c8",fontSize:12,marginBottom:16,lineHeight:1.6}}>Sign in to save your profile, track your games, and appear on the leaderboard. We'll send a magic link to your email — no password needed.</div>
+            {authMsg ? (
+              <div style={{background:"#0f1923",border:"1px solid #4ade8050",borderRadius:12,padding:16,color:"#4ade80",fontSize:13,textAlign:"center"}}>{authMsg}</div>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={authEmail}
+                  onChange={e=>setAuthEmail(e.target.value)}
+                  style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:12,outline:"none",boxSizing:"border-box"}}
+                />
+                <button onClick={async()=>{
+                  if(!authEmail) return;
+                  const {error} = await supabase.auth.signInWithOtp({email:authEmail, options:{emailRedirectTo:"https://hooptheory.app"}});
+                  if(error) setAuthMsg("Error: "+error.message);
+                  else setAuthMsg("Check your email for a magic link!");
+                }} style={{width:"100%",background:"#f4a426",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:1}}>
+                  SEND MAGIC LINK
+                </button>
+                <button onClick={async()=>{
+                  await supabase.auth.signInWithOAuth({provider:"google", options:{redirectTo:"https://hooptheory.app"}});
+                }} style={{width:"100%",background:"#fff",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:700,cursor:"pointer",marginTop:8}}>
+                  Sign in with Google
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {showFirstVisit&&(
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -3073,16 +3133,19 @@ export default function HoopTheory(){
           <div style={{maxWidth:480,margin:"0 auto"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
               <div style={{color:"#fff",fontSize:20,fontWeight:800,letterSpacing:1}}>YOUR PROFILE</div>
-              <button onClick={()=>{setShowProfile(false);setShowBestTeam(false);}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                {user&&<button onClick={async()=>{await supabase.auth.signOut();setShowProfile(false);}} style={{background:"none",border:"1px solid #f8717150",color:"#f87171",borderRadius:20,padding:"4px 10px",cursor:"pointer",fontSize:10}}>Sign Out</button>}
+                <button onClick={()=>{setShowProfile(false);setShowBestTeam(false);}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+              </div>
             </div>
 
             {profile ? (
               <div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:20}}>
                   {[
-                    {icon:"🏀",label:"Games Played",value:profile.gamesPlayed},
-                    {icon:"🏆",label:"Best Record",value:`${profile.bestWins}-${82-profile.bestWins}`},
-                    {icon:"⭐",label:"Best OVR",value:profile.bestOvr},
+                    {icon:"🏀",label:"Games Played",value:profile.games_played},
+                    {icon:"🏆",label:"Best Record",value:`${profile.best_wins}-${82-profile.best_wins}`},
+                    {icon:"⭐",label:"Best OVR",value:profile.best_ovr},
                   ].map(({icon,label,value})=>(
                     <div key={label} style={{background:"#1e2a3a",borderRadius:12,padding:"14px 10px",textAlign:"center"}}>
                       <div style={{fontSize:20,marginBottom:4}}>{icon}</div>
@@ -3092,7 +3155,7 @@ export default function HoopTheory(){
                   ))}
                 </div>
 
-                {profile.bestTeam&&(
+                {profile.best_team&&(
                   <div style={{marginBottom:20}}>
                     <button onClick={()=>setShowBestTeam(p=>!p)}
                       style={{width:"100%",background:"#1e2a3a",border:"1px solid #f4a42640",borderRadius:12,padding:"12px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
@@ -3101,8 +3164,8 @@ export default function HoopTheory(){
                     </button>
                     {showBestTeam&&(
                       <div style={{background:"#151f2e",borderRadius:"0 0 12px 12px",padding:"12px 16px",border:"1px solid #f4a42630",borderTop:"none"}}>
-                        <div style={{color:"#8899aa",fontSize:10,marginBottom:8}}>{profile.bestTeam.date} · {profile.bestTeam.score.wins}-{profile.bestTeam.score.losses} · {profile.bestTeam.score.gradeLabel} · OVR {profile.bestTeam.score.ovr}</div>
-                        {profile.bestTeam.roster.map((r,i)=>(
+                        <div style={{color:"#8899aa",fontSize:10,marginBottom:8}}>{profile.best_team.date} · {profile.best_team.score.wins}-{profile.best_team.score.losses} · {profile.best_team.score.gradeLabel} · OVR {profile.best_team.score.ovr}</div>
+                        {profile.best_team.roster.map((r,i)=>(
                           <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #ffffff10"}}>
                             <div style={{display:"flex",alignItems:"center",gap:10}}>
                               <div style={{background:"#2a3a4a",borderRadius:6,padding:"2px 7px",fontSize:10,fontWeight:700,color:"#60a5fa"}}>{r.filledAs}</div>
@@ -3127,7 +3190,7 @@ export default function HoopTheory(){
                 {recentGames.map((g,i)=>(
                   <div key={i} style={{background:"#1e2a3a",borderRadius:12,padding:"12px 16px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <div>
-                      <div style={{color:g.grade==="S"?"#f4a426":g.grade==="A"?"#4ade80":g.grade==="B"?"#60a5fa":g.grade==="C"?"#facc15":"#f87171",fontSize:13,fontWeight:800}}>{g.grade} {g.gradeLabel}</div>
+                      <div style={{color:g.grade==="S"?"#f4a426":g.grade==="A"?"#4ade80":g.grade==="B"?"#60a5fa":g.grade==="C"?"#facc15":"#f87171",fontSize:13,fontWeight:800}}>{g.grade} {g.grade_label}</div>
                       <div style={{color:"#8899aa",fontSize:10,marginTop:2}}>{g.date}</div>
                     </div>
                     <div style={{textAlign:"right"}}>
@@ -3140,7 +3203,7 @@ export default function HoopTheory(){
             ) : (
               <div style={{textAlign:"center",color:"#8899aa",padding:40}}>
                 <div style={{fontSize:40,marginBottom:12}}>🏀</div>
-                <div style={{fontSize:14}}>Play your first game to start tracking your profile!</div>
+                {user ? <div style={{fontSize:14}}>Play your first game to start tracking your profile!</div> : <><div style={{fontSize:14,marginBottom:16}}>Sign in to track your profile and appear on the leaderboard.</div><button onClick={()=>{setShowProfile(false);setShowAuth(true);}} style={{background:"#f4a426",border:"none",borderRadius:12,padding:"12px 24px",color:"#000",fontSize:13,fontWeight:800,cursor:"pointer"}}>SIGN IN</button></>}
               </div>
             )}
           </div>
