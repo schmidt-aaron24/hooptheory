@@ -3049,13 +3049,95 @@ export default function HoopTheory(){
             style={{background:"none",border:"1px solid #60a5fa50",color:"#60a5fa",borderRadius:20,padding:"5px 14px",cursor:"pointer",fontSize:10,letterSpacing:1}}>
             {user ? "👤 PROFILE" : "🔑 SIGN IN"}
           </button>
-          <button onClick={()=>setPhase(p=>p==="rules"?"idle":"rules")}
-            style={{background:"none",border:"1px solid #f4a42650",color:"#f4a426",borderRadius:20,padding:"5px 14px",cursor:"pointer",fontSize:10,letterSpacing:1}}>
-            {phase==="rules"?"← BACK":"RULES"}
+          <button onClick={()=>setShowMenu(true)}
+            style={{background:"none",border:"1px solid #ffffff20",color:"#fff",borderRadius:8,padding:"5px 10px",cursor:"pointer",fontSize:16,lineHeight:1}}>
+            ☰
           </button>
         </div>
       </div>
 
+
+      {showMenu&&(
+        <div style={{position:"fixed",inset:0,zIndex:200}} onClick={()=>setShowMenu(false)}>
+          <div style={{position:"absolute",top:0,left:0,bottom:0,width:280,background:"#0a1520",borderRight:"1px solid #1e2f40",display:"flex",flexDirection:"column"}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:"24px 20px",borderBottom:"1px solid #1e2f40",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div>
+                <div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:900,color:"#f4a426",letterSpacing:2}}>HOOP THEORY</div>
+                <div style={{fontSize:9,color:"#4a6a8a",letterSpacing:3,marginTop:2}}>BALANCED ROSTER BUILDER</div>
+              </div>
+              <button onClick={()=>setShowMenu(false)} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{flex:1,padding:"16px 0"}}>
+              {[
+                {icon:"📋",label:"Rules",action:()=>{setPhase("rules");setShowMenu(false);}},
+                {icon:"👤",label:"Profile",action:()=>{user?setShowProfile(true):setShowAuth(true);setShowMenu(false);}},
+                {icon:"☕",label:"Support Us",action:()=>{window.open("https://ko-fi.com/playhooptheory","_blank");setShowMenu(false);}},
+                {icon:"🔒",label:"Privacy Policy",action:()=>{setShowPrivacy(true);setShowMenu(false);}},
+              ].map(({icon,label,action})=>(
+                <button key={label} onClick={action}
+                  style={{width:"100%",background:"none",border:"none",padding:"16px 20px",display:"flex",alignItems:"center",gap:14,cursor:"pointer",color:"#fff",fontSize:14,fontWeight:600,textAlign:"left",borderBottom:"1px solid #ffffff08"}}>
+                  <span style={{fontSize:18,minWidth:24}}>{icon}</span>
+                  {label}
+                  <span style={{marginLeft:"auto",color:"#4a6a8a",fontSize:12}}>›</span>
+                </button>
+              ))}
+            </div>
+            <div style={{padding:"20px",borderTop:"1px solid #1e2f40"}}>
+              <div style={{fontSize:10,color:"#2a4a6a",lineHeight:1.6}}>Hoop Theory is not affiliated with, endorsed by, or sponsored by the NBA or any of its teams or players.</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPrivacy&&(
+        <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:200,overflowY:"auto",padding:"24px 16px"}}>
+          <div style={{maxWidth:560,margin:"0 auto"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <div style={{color:"#fff",fontSize:20,fontWeight:800}}>Privacy Policy</div>
+              <button onClick={()=>setShowPrivacy(false)} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{background:"#0f1923",borderRadius:16,padding:"24px 20px",color:"#94b4c8",fontSize:13,lineHeight:1.8}}>
+              <div style={{color:"#8899aa",fontSize:11,marginBottom:20}}>Last updated June 9, 2026</div>
+              <p style={{color:"#ccd9e8",marginTop:0}}>Hoop Theory ("we," "us," "the game") is a free browser-based basketball game. This policy explains what we collect and why.</p>
+              {[
+                ["Information We Collect",[
+                  "Account details — if you sign up, we store your email address and chosen username.",
+                  "Game data — the rosters you draft and your scores, saved to your account so you can track your history. You can play anonymously without saving anything.",
+                  "Local storage — we cache game settings in your browser to keep things fast. This stays on your device."
+                ]],
+                ["How We Use Your Information",[
+                  "Run the game, save your rosters, and show your profile stats.",
+                  "Authenticate your account and enable sign-in.",
+                  "Improve the game over time."
+                ]],
+                ["Service Providers",[
+                  "Supabase — authentication and database (account and game data).",
+                  "Vercel — hosting and content delivery.",
+                  "Resend — transactional email (magic links and account confirmations)."
+                ]],
+                ["Your Choices & Rights",[
+                  "Play anonymously — you can use Hoop Theory without an account; nothing is saved to a profile.",
+                  "Delete your account — to request deletion of your account and data, email privacy@hooptheory.app.",
+                  "Clear local data — clearing your browser storage removes cached settings."
+                ]],
+                ["Data Retention",["We keep account and game data for as long as your account is active. When you delete your account, we remove your personal data within a reasonable period."]],
+                ["Children's Privacy",["Hoop Theory is not directed to children under 13, and we do not knowingly collect their personal information."]],
+                ["Changes to This Policy",["We may update this policy as the game evolves. We'll update the date above when we do."]],
+              ].map(([title,items])=>(
+                <div key={title} style={{marginBottom:20}}>
+                  <div style={{color:"#fff",fontWeight:700,fontSize:14,marginBottom:8,paddingBottom:8,borderBottom:"1px solid #1e2f40"}}>{title}</div>
+                  {items.map((item,i)=>(
+                    <div key={i} style={{display:"flex",gap:8,marginBottom:6}}>
+                      <span style={{color:"#f4a426",marginTop:2,flexShrink:0}}>·</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAuth&&(
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -3663,7 +3745,7 @@ export default function HoopTheory(){
         <div style={{padding:"20px 16px",textAlign:"center",borderTop:"1px solid #ffffff08",marginTop:8}}>
           <div style={{color:"#fff",fontSize:13,fontWeight:700,marginBottom:12}}>Enjoying Hoop Theory?</div>
           <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:16}}>
-            <a href="https://ko-fi.com/hooptheory" target="_blank" rel="noopener noreferrer"
+            <a href="https://ko-fi.com/playhooptheory" target="_blank" rel="noopener noreferrer"
               style={{background:"#f4a426",borderRadius:20,padding:"8px 18px",color:"#000",fontSize:12,fontWeight:800,textDecoration:"none",letterSpacing:1}}>
               ☕ Support Us
             </a>
