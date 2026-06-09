@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/share-image", "destination": "/api/share-image/index.js" },
+    { "source": "/share/:id", "destination": "/api/share/[id].js" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
