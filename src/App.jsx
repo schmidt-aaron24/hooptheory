@@ -2959,18 +2959,6 @@ export default function HoopTheory(){
 
   function confirmPick(player,pos){
     const newRoster=[...roster,{player,filledAs:pos}];
-    // Track what else was available this round
-    const allAvailable = getPlayersForSlot(currentSlot.team, currentSlot.decade)
-      .filter(p=>!usedNames.has(p.name) && p.name !== player.name)
-      .sort((a,b)=>b.ppg-a.ppg)
-      .slice(0,2);
-    setDraftHistory(prev=>[...prev,{
-      round: roster.length+1,
-      team: currentSlot.team,
-      decade: currentSlot.decade,
-      picked: player,
-      alternatives: allAvailable
-    }]);
     setRoster(newRoster);
     const aliases = NAME_ALIASES[player.name] || [];
     setUsedNames(prev=>new Set([...prev,player.name,...aliases]));
