@@ -2672,7 +2672,7 @@ const UNCOMMON_FRANCHISES = new Set(["Washington Wizards|1960s",
 
 function getFranchiseWeight(team, decade) {
   const key = team + "|" + decade;
-  if (RARE_FRANCHISES.has(key)) return 2;
+  if (RARE_FRANCHISES.has(key)) return 6;
   if (UNCOMMON_FRANCHISES.has(key)) return 8;
   return 45;
 }
