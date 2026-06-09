@@ -2819,6 +2819,8 @@ export default function HoopTheory(){
   const [user,setUser]=useState(null);
   const [showAuth,setShowAuth]=useState(false);
   const [authEmail,setAuthEmail]=useState("");
+  const [authPassword,setAuthPassword]=useState("");
+  const [authMode,setAuthMode]=useState("password");
   const [authMsg,setAuthMsg]=useState("");
 
   const gradeColor={S:"#f4a426",A:"#4ade80",B:"#60a5fa",C:"#a78bfa",D:"#fb923c",F:"#f87171"};
@@ -3058,33 +3060,60 @@ export default function HoopTheory(){
       {showAuth&&(
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
           <div style={{background:"#1a2535",borderRadius:20,padding:24,maxWidth:380,width:"100%"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
               <div style={{color:"#f4a426",fontSize:16,fontWeight:700}}>SIGN IN</div>
-              <button onClick={()=>{setShowAuth(false);setAuthMsg("");}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+              <button onClick={()=>{setShowAuth(false);setAuthMsg("");setAuthMode("password");}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
             </div>
-            <div style={{color:"#94b4c8",fontSize:12,marginBottom:16,lineHeight:1.6}}>Sign in to save your profile, track your games, and appear on the leaderboard. We'll send a magic link to your email — no password needed.</div>
             {authMsg ? (
-              <div style={{background:"#0f1923",border:"1px solid #4ade8050",borderRadius:12,padding:16,color:"#4ade80",fontSize:13,textAlign:"center"}}>{authMsg}</div>
+              <div style={{background:"#0f1923",border:"1px solid #4ade8050",borderRadius:12,padding:16,color:"#4ade80",fontSize:13,textAlign:"center",marginBottom:12}}>{authMsg}
+                <button onClick={()=>setAuthMsg("")} style={{display:"block",margin:"10px auto 0",background:"none",border:"none",color:"#8899aa",fontSize:12,cursor:"pointer"}}>Back</button>
+              </div>
             ) : (
               <>
+                <div style={{display:"flex",gap:6,marginBottom:16}}>
+                  {["password","magic","signup"].map(m=>(
+                    <button key={m} onClick={()=>setAuthMode(m)} style={{flex:1,background:authMode===m?"#f4a426":"#0f1923",border:"1px solid #2a3a4a",borderRadius:8,padding:"7px 0",color:authMode===m?"#000":"#8899aa",fontSize:10,fontWeight:700,cursor:"pointer"}}>
+                      {m==="password"?"Sign In":m==="magic"?"Magic Link":"Sign Up"}
+                    </button>
+                  ))}
+                </div>
                 <input
                   type="email"
                   placeholder="your@email.com"
                   value={authEmail}
                   onChange={e=>setAuthEmail(e.target.value)}
-                  style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:12,outline:"none",boxSizing:"border-box"}}
+                  style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:10,outline:"none",boxSizing:"border-box"}}
                 />
+                {(authMode==="password"||authMode==="signup")&&(
+                  <input
+                    type="password"
+                    placeholder={authMode==="signup"?"Create a password":"Password"}
+                    value={authPassword||""}
+                    onChange={e=>setAuthPassword(e.target.value)}
+                    style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:10,outline:"none",boxSizing:"border-box"}}
+                  />
+                )}
                 <button onClick={async()=>{
                   if(!authEmail) return;
-                  const {error} = await supabase.auth.signInWithOtp({email:authEmail, options:{emailRedirectTo:"https://hooptheory.app"}});
-                  if(error) setAuthMsg("Error: "+error.message);
-                  else setAuthMsg("Check your email for a magic link!");
-                }} style={{width:"100%",background:"#f4a426",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:1}}>
-                  SEND MAGIC LINK
+                  if(authMode==="magic"){
+                    const {error} = await supabase.auth.signInWithOtp({email:authEmail, options:{emailRedirectTo:"https://hooptheory.app"}});
+                    if(error) setAuthMsg("Error: "+error.message);
+                    else setAuthMsg("Check your email for a magic link!");
+                  } else if(authMode==="signup"){
+                    const {error} = await supabase.auth.signUp({email:authEmail, password:authPassword, options:{emailRedirectTo:"https://hooptheory.app"}});
+                    if(error) setAuthMsg("Error: "+error.message);
+                    else setAuthMsg("Account created! Check your email to confirm.");
+                  } else {
+                    const {error} = await supabase.auth.signInWithPassword({email:authEmail, password:authPassword});
+                    if(error) setAuthMsg("Error: "+error.message);
+                    else { setShowAuth(false); setAuthMsg(""); }
+                  }
+                }} style={{width:"100%",background:"#f4a426",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:800,cursor:"pointer",letterSpacing:1,marginBottom:8}}>
+                  {authMode==="magic"?"SEND MAGIC LINK":authMode==="signup"?"CREATE ACCOUNT":"SIGN IN"}
                 </button>
                 <button onClick={async()=>{
                   await supabase.auth.signInWithOAuth({provider:"google", options:{redirectTo:"https://hooptheory.app"}});
-                }} style={{width:"100%",background:"#fff",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:700,cursor:"pointer",marginTop:8}}>
+                }} style={{width:"100%",background:"#fff",border:"none",borderRadius:12,padding:14,color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}}>
                   Sign in with Google
                 </button>
               </>
