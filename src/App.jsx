@@ -2813,6 +2813,9 @@ export default function HoopTheory(){
   const [profile,setProfile]=useState(null);
   const [recentGames,setRecentGames]=useState([]);
   const [showBestTeam,setShowBestTeam]=useState(false);
+  const [profileTab,setProfileTab]=useState("profile");
+  const [leaderboard,setLeaderboard]=useState([]);
+  const [lbLoading,setLbLoading]=useState(false);
   const [user,setUser]=useState(null);
   const [showAuth,setShowAuth]=useState(false);
   const [authEmail,setAuthEmail]=useState("");
@@ -3131,16 +3134,78 @@ export default function HoopTheory(){
       {showProfile&&(
         <div style={{position:"fixed",inset:0,background:"#000000ee",zIndex:100,overflowY:"auto",padding:"24px 16px"}}>
           <div style={{maxWidth:480,margin:"0 auto"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <div style={{color:"#fff",fontSize:20,fontWeight:800,letterSpacing:1}}>YOUR PROFILE</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <div style={{color:"#fff",fontSize:20,fontWeight:800,letterSpacing:1}}>{profileTab==="leaderboard"?"LEADERBOARD":"YOUR PROFILE"}</div>
               <div style={{display:"flex",gap:8,alignItems:"center"}}>
                 {user&&<button onClick={async()=>{await supabase.auth.signOut();setShowProfile(false);}} style={{background:"none",border:"1px solid #f8717150",color:"#f87171",borderRadius:20,padding:"4px 10px",cursor:"pointer",fontSize:10}}>Sign Out</button>}
-                <button onClick={()=>{setShowProfile(false);setShowBestTeam(false);}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
+                <button onClick={()=>{setShowProfile(false);setShowBestTeam(false);setProfileTab("profile");}} style={{background:"none",border:"none",color:"#aaa",fontSize:22,cursor:"pointer"}}>✕</button>
               </div>
             </div>
 
-            {profile ? (
+            <div style={{display:"flex",gap:8,marginBottom:20}}>
+              {["profile","leaderboard"].map(tab=>(
+                <button key={tab} onClick={async()=>{
+                  setProfileTab(tab);
+                  if(tab==="leaderboard" && leaderboard.length===0){
+                    setLbLoading(true);
+                    const {data} = await supabase.from('leaderboard').select('*').limit(50);
+                    if(data) setLeaderboard(data);
+                    setLbLoading(false);
+                  }
+                }} style={{flex:1,background:profileTab===tab?"#f4a426":"#1e2a3a",border:"none",borderRadius:10,padding:"8px 0",color:profileTab===tab?"#000":"#8899aa",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1,textTransform:"uppercase"}}>
+                  {tab==="profile"?"👤 Profile":"🏆 Leaderboard"}
+                </button>
+              ))}
+            </div>
+
+            {profileTab==="leaderboard" ? (
               <div>
+                {lbLoading ? (
+                  <div style={{textAlign:"center",color:"#8899aa",padding:40}}>Loading...</div>
+                ) : leaderboard.length===0 ? (
+                  <div style={{textAlign:"center",color:"#8899aa",padding:40}}>
+                    <div style={{fontSize:40,marginBottom:12}}>🏆</div>
+                    <div style={{fontSize:14}}>No games on the leaderboard yet. Be the first!</div>
+                  </div>
+                ) : (
+                  <div>
+                    {leaderboard.map((entry,i)=>(
+                      <div key={entry.id} style={{background: i===0?"#1e2a3a":i===1?"#1a2535":i===2?"#161e2c":"#111820", borderRadius:12,padding:"12px 16px",marginBottom:8,display:"flex",alignItems:"center",gap:12,border:i<3?`1px solid ${i===0?"#f4a42640":i===1?"#94a3b840":"#c084fc40"}`:"none"}}>
+                        <div style={{fontSize:i===0?22:i===1?18:i===2?16:14,minWidth:28,textAlign:"center"}}>{i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}`}</div>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{color:"#fff",fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{entry.username||entry.id.slice(0,8)+"..."}</div>
+                          <div style={{color:"#8899aa",fontSize:10,marginTop:2}}>{entry.games_played} games played</div>
+                        </div>
+                        <div style={{textAlign:"right"}}>
+                          <div style={{color:i===0?"#f4a426":i===1?"#94a3b8":i===2?"#c084fc":"#fff",fontSize:16,fontWeight:800}}>{entry.best_wins}-{82-entry.best_wins}</div>
+                          <div style={{color:"#8899aa",fontSize:10}}>OVR {entry.best_ovr}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : profile ? (
+              <div>
+                <div style={{marginBottom:16,display:"flex",gap:8,alignItems:"center"}}>
+                  <input
+                    type="text"
+                    placeholder="Set your username"
+                    defaultValue={profile.username||""}
+                    id="username-input"
+                    maxLength={20}
+                    style={{flex:1,background:"#1e2a3a",border:"1px solid #2a3a4a",borderRadius:10,padding:"10px 14px",color:"#fff",fontSize:13,outline:"none"}}
+                  />
+                  <button onClick={async()=>{
+                    const val = document.getElementById("username-input").value.trim();
+                    if(!val) return;
+                    const {data} = await supabase.from('profiles').update({username:val}).eq('id',user.id).select().single();
+                    if(data) setProfile(data);
+                  }} style={{background:"#f4a426",border:"none",borderRadius:10,padding:"10px 16px",color:"#000",fontSize:12,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>
+                    SAVE
+                  </button>
+                </div>
+
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:20}}>
                   {[
                     {icon:"🏀",label:"Games Played",value:profile.games_played},
@@ -3206,6 +3271,7 @@ export default function HoopTheory(){
                 {user ? <div style={{fontSize:14}}>Play your first game to start tracking your profile!</div> : <><div style={{fontSize:14,marginBottom:16}}>Sign in to track your profile and appear on the leaderboard.</div><button onClick={()=>{setShowProfile(false);setShowAuth(true);}} style={{background:"#f4a426",border:"none",borderRadius:12,padding:"12px 24px",color:"#000",fontSize:13,fontWeight:800,cursor:"pointer"}}>SIGN IN</button></>}
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
