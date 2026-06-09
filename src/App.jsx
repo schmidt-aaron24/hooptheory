@@ -3271,7 +3271,6 @@ export default function HoopTheory(){
                 {user ? <div style={{fontSize:14}}>Play your first game to start tracking your profile!</div> : <><div style={{fontSize:14,marginBottom:16}}>Sign in to track your profile and appear on the leaderboard.</div><button onClick={()=>{setShowProfile(false);setShowAuth(true);}} style={{background:"#f4a426",border:"none",borderRadius:12,padding:"12px 24px",color:"#000",fontSize:13,fontWeight:800,cursor:"pointer"}}>SIGN IN</button></>}
               </div>
             )}
-            </div>
           </div>
         </div>
       )}
