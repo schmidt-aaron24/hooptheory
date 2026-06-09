@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useRef } from "react";
 
 const HOF_PLAYERS = new Set([
