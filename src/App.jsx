@@ -3037,7 +3037,8 @@ export default function HoopTheory(){
     } else if(platform==="copy"){
       navigator.clipboard.writeText(shareUrl||text).then(()=>setShareMsg("Copied!")).catch(()=>setShareMsg("Failed"));
     } else if(platform==="twitter"){
-      const tweet = `🏀 Hoop Theory: ${score.wins}-${score.losses} | ${score.gradeLabel} | OVR ${score.ovr}\n${roster.map(r=>r.player.name).join(" · ")}\n\nCan you beat me?`;
+      const u = shareUrl||"https://hooptheory.app";
+      const tweet = `🏀 I went ${score.wins}-${score.losses} (${score.gradeLabel}) on Hoop Theory. Can you beat me?\n${u}`;
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, "_blank");
     } else if(platform==="facebook"){
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://hooptheory.app")}`, "_blank");
