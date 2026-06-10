@@ -2717,7 +2717,7 @@ function scoreTeam(roster) {
   const raw = (t.ppg*assistMult) + rebScore + (t.apg*1.5) + (t.spg*3.0) + (t.bpg*3.0);
 
   const hofCount = roster.filter(r=>HOF_PLAYERS.has(r.player.name)).length;
-  const hofBonus = hofCount>=5?6 : hofCount>=4?4 : hofCount>=3?2 : 0;
+  const hofBonus = hofCount>=5?6 : hofCount>=4?4 : hofCount>=3?2 : hofCount>=2?1 : 0;
 
   const ppgMod = t.ppg * assistMult;
   const eliteCount = [
@@ -3614,7 +3614,7 @@ export default function HoopTheory(){
                     <div style={{color:"#94b4c8",fontSize:9,letterSpacing:1}}>OVR</div>
                   </div>
                 </div>
-                {score.hofCount>=3&&<div style={{marginTop:10,color:"#f4a426",fontSize:11}}>★ {score.hofCount} Hall of Famers · +{score.hofBonus} win bonus</div>}
+                {score.hofBonus>0&&<div style={{marginTop:10,color:"#f4a426",fontSize:11}}>★ {score.hofCount} Hall of Famers · +{score.hofBonus} win bonus</div>}
               </div>
 
 
