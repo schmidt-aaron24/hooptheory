@@ -3177,7 +3177,7 @@ export default function HoopTheory(){
               ["⭐ SCORE","Your team is scored on PPG, RPG, APG, SPG, and BPG. Balance matters more than stacking one stat."],
               ["🎯 ASSISTS","19+ APG = bonus. Under 19 = penalty. Always draft a playmaker."],
               ["🛡️ DEFENSE","Steals and blocks carry 3x weight. A lockdown defender is worth more than their PPG suggests."],
-              ["🏆 BONUSES","3+ HOF players = +2 wins. Hit 3+ elite stat categories = +2 wins. Stack both for legendary results."],
+              ["🏆 BONUSES","2 HOF players = +1 win. 3+ HOF = +2 wins. Hit 3+ elite stat categories = +2 wins. Stack both for legendary results."],
               ["🎯 GOAL","Go 82-0. It's harder than it sounds."],
             ].map(([title, desc])=>(
               <div key={title} style={{marginBottom:10,padding:"10px 12px",background:"#0f1923",borderRadius:10}}>
@@ -3414,7 +3414,7 @@ export default function HoopTheory(){
               ["SCORING: POINTS","Team PPG is adjusted by your assist total. Under 19 APG = penalty. 19-23 = small bonus. 23+ = elite bonus. A pure scoring team without a playmaker will always underperform."],
               ["SCORING: REBOUNDS & DEFENSE","Rebounds count fully up to 50 RPG. Steals and blocks carry 3x weight — a lockdown defender contributes far more than their raw numbers suggest."],
               ["BIG NAMES \u2260 WINS","Oscar Robertson, Michael Jordan, and Shaquille O'Neal on the same team might only win 63 games if their rebounds, assists, steals and blocks don't hold up. The engine only sees the numbers \u2014 not the names."],
-              ["HALL OF FAME BONUS","3 HOFers = +2 wins. 4 HOFers = +4 wins. 5 HOFers = +6 wins."],
+              ["HALL OF FAME BONUS","2 HOFers = +1 win. 3 HOFers = +2 wins. 4 HOFers = +4 wins. 5 HOFers = +6 wins."],
               ["ELITE BALANCE BONUS","Hit 3 elite categories = +2 wins. Hit 4 = +4 wins. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 12+ SPG+BPG. Reward for true balance."],
               ["PATHS TO 82-0","🔥 SCORER'S PATH: Historic PPG (130+) with elite assists. Stack scorers but don't neglect your playmaker. ⚖️ BALANCED ELITE: Hit 3+ elite categories — 120+ PPG, 40+ RPG, 23+ APG, or 12+ SPG+BPG. The balance bonus rewards this. 🛡️ DEFENSIVE ANCHOR: Elite steals+blocks (12+) carry extra weight. Two-way players can overperform their PPG. ☠️ WHAT KILLS EVERY TEAM: Ignoring assists. Under 19 APG penalizes your scoring no matter how high it is."],
               ["THE WIN CURVE","82-0 requires near-perfect balance across most categories. You can have one weakness if everything else is exceptional \u2014 but you cannot coast on a single dominant stat."],
