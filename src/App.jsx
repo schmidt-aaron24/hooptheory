@@ -2724,11 +2724,12 @@ function scoreTeam(roster) {
     ppgMod >= 120,
     t.rpg >= 40,
     t.apg >= 23,
-    (t.spg + t.bpg) >= 12,
+    t.spg >= 7.0,
+    t.bpg >= 5.0,
   ].filter(Boolean).length;
-  const eliteBonus = eliteCount>=4?4 : eliteCount>=3?2 : 0;
+  const eliteBonus = eliteCount>=5?8 : eliteCount>=4?6 : eliteCount>=3?4 : eliteCount>=2?2 : 0;
 
-  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/258, 1.125)));
+  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/255, 1.125)));
   const wins = Math.min(82, rawWins+hofBonus+eliteBonus);
   const losses = 82-wins;
   const grade = wins>=82?"S":wins>=70?"A":wins>=60?"B":wins>=50?"C":wins>=40?"D":"F";
@@ -3415,7 +3416,7 @@ export default function HoopTheory(){
               ["SCORING: REBOUNDS & DEFENSE","Rebounds count fully up to 50 RPG. Steals and blocks carry 3x weight — a lockdown defender contributes far more than their raw numbers suggest."],
               ["BIG NAMES \u2260 WINS","Oscar Robertson, Michael Jordan, and Shaquille O'Neal on the same team might only win 63 games if their rebounds, assists, steals and blocks don't hold up. The engine only sees the numbers \u2014 not the names."],
               ["HALL OF FAME BONUS","2 HOFers = +1 win. 3 HOFers = +2 wins. 4 HOFers = +4 wins. 5 HOFers = +6 wins."],
-              ["ELITE BALANCE BONUS","Hit 3 elite categories = +2 wins. Hit 4 = +4 wins. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 12+ SPG+BPG. Reward for true balance."],
+              ["ELITE BALANCE BONUS","Hit 2 elite categories = +2 wins. 3=+4. 4=+6. 5=+8. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 7+ SPG · 5+ BPG. Steals and blocks now count separately — you need a ball hawk AND a shot blocker."],
               ["PATHS TO 82-0","🔥 SCORER'S PATH: Historic PPG (130+) with elite assists. Stack scorers but don't neglect your playmaker. ⚖️ BALANCED ELITE: Hit 3+ elite categories — 120+ PPG, 40+ RPG, 23+ APG, or 12+ SPG+BPG. The balance bonus rewards this. 🛡️ DEFENSIVE ANCHOR: Elite steals+blocks (12+) carry extra weight. Two-way players can overperform their PPG. ☠️ WHAT KILLS EVERY TEAM: Ignoring assists. Under 19 APG penalizes your scoring no matter how high it is."],
               ["THE WIN CURVE","82-0 requires near-perfect balance across most categories. You can have one weakness if everything else is exceptional \u2014 but you cannot coast on a single dominant stat."],
               ["FRANCHISE NAMES","All teams use their modern franchise name regardless of era. The 1970s Sacramento Kings are the old Kansas City-Omaha Kings. The 1990s Oklahoma City Thunder are the old Seattle SuperSonics. The 1960s Golden State Warriors are the old Philadelphia and San Francisco Warriors. Same franchise, different city — the players and stats reflect that specific era."],
@@ -3627,8 +3628,8 @@ export default function HoopTheory(){
                 <StatBar label={`RPG${score.totals.rpg>50?" (capped at 50)":""}`} value={score.rebScore} max={50} color="#60a5fa"
                   note={score.totals.rpg>50?`raw ${score.totals.rpg.toFixed(1)}`:null}/>
                 <StatBar label="APG" value={score.totals.apg} max={40} color="#a78bfa"/>
-                <StatBar label={`SPG (×3 weight)${(score.totals.spg+score.totals.bpg)>=12?" ⭐":""}`} value={score.totals.spg} max={15} color="#f4a426"/>
-                <StatBar label="BPG (×3 weight)" value={score.totals.bpg} max={15} color="#fb923c"/>
+                <StatBar label={`SPG (×3 weight)${score.totals.spg>=7.0?" ⭐":""}`} value={score.totals.spg} max={15} color="#f4a426"/>
+                <StatBar label={`BPG (×3 weight)${score.totals.bpg>=5.0?" ⭐":""}`} value={score.totals.bpg} max={15} color="#fb923c"/>
               </div>
 
               <div style={{background:"#0a1520",border:"1px solid #1a2535",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
@@ -3636,16 +3637,20 @@ export default function HoopTheory(){
                 {score.assistMult<0.97&&<div style={{color:"#fbbf24",fontSize:12,marginBottom:8,lineHeight:1.6}}>⚠️ Low assists ({score.totals.apg.toFixed(1)} APG) hurt scoring efficiency — need 19+ for neutral, 23+ for bonus.</div>}
                 {score.totals.rpg>50&&<div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>📉 {score.totals.rpg.toFixed(1)} RPG exceeded the 50-board threshold — diminishing returns kicked in.</div>}
                 {(()=>{
-                const defTotal = score.totals.spg + score.totals.bpg;
-                if(defTotal >= 14.0) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Historically dominant defense — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG. One of the all-time great defensive rosters.</div>;
-                if(defTotal >= 12.0) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite defense — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG. This team locks down opponents.</div>;
-                if(defTotal >= 9.5) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Strong defensive team — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG.</div>;
-                if(defTotal >= 7.5) return <div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Solid defense — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG. Room to improve.</div>;
-                return <div style={{color:"#f87171",fontSize:12,marginBottom:8,lineHeight:1.6}}>⚠️ Weak defense — {score.totals.spg.toFixed(1)} SPG + {score.totals.bpg.toFixed(1)} BPG. You'll get scored on.</div>;
+                const spg = score.totals.spg;
+                const bpg = score.totals.bpg;
+                const spgEl = spg >= 7.0;
+                const bpgEl = bpg >= 5.0;
+                if(spgEl && bpgEl) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite defense — {spg.toFixed(1)} SPG ⭐ + {bpg.toFixed(1)} BPG ⭐. This team locks down opponents.</div>;
+                if(spgEl) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite ball hawks — {spg.toFixed(1)} SPG ⭐. Add a shot blocker (5+ BPG) for full defensive elite.</div>;
+                if(bpgEl) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite shot blocking — {bpg.toFixed(1)} BPG ⭐. Add a ball hawk (7+ SPG) for full defensive elite.</div>;
+                if(spg+bpg >= 9.5) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Strong defensive team — {spg.toFixed(1)} SPG + {bpg.toFixed(1)} BPG.</div>;
+                if(spg+bpg >= 7.5) return <div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Solid defense — {spg.toFixed(1)} SPG + {bpg.toFixed(1)} BPG. Room to improve.</div>;
+                return <div style={{color:"#f87171",fontSize:12,marginBottom:8,lineHeight:1.6}}>⚠️ Weak defense — {spg.toFixed(1)} SPG + {bpg.toFixed(1)} BPG. You need defenders.</div>;
               })()}
               {(()=>{
                 const ppg = score.totals.ppg * score.assistMult;
-                if(ppg >= 130) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🔥 Historically elite offense — {ppg.toFixed(1)} PPG after assist mod. This team can score from anywhere.</div>;
+                if(ppg >= 125) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🔥 Historically elite offense — {ppg.toFixed(1)} PPG after assist mod. This team can score from anywhere.</div>;
                 if(ppg >= 115) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>💪 Strong scoring lineup — {ppg.toFixed(1)} PPG after assist mod.</div>;
                 if(ppg >= 100) return <div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>📊 Average offense — {ppg.toFixed(1)} PPG. Look for bigger scorers next build.</div>;
                 return <div style={{color:"#f87171",fontSize:12,marginBottom:8,lineHeight:1.6}}>😬 Weak scoring — {ppg.toFixed(1)} PPG. This team struggles to put up points.</div>;
@@ -3671,16 +3676,16 @@ export default function HoopTheory(){
                 const ppg = score.totals.ppg * score.assistMult;
                 const rpg = score.totals.rpg;
                 const apg = score.totals.apg;
-                const def = score.totals.spg + score.totals.bpg;
                 const wins = score.wins;
                 if(wins >= 82) return null;
                 // Find weakest category to call out
                 // Score each category as % of its ideal target
                 const scores = [
-                  {label:"scoring", val:ppg, target:132, unit:"PPG"},
-                  {label:"rebounding", val:rpg, target:44, unit:"RPG"},
+                  {label:"scoring", val:ppg, target:122, unit:"PPG"},
+                  {label:"rebounding", val:rpg, target:40, unit:"RPG"},
                   {label:"assists", val:apg, target:23, unit:"APG"},
-                  {label:"steals+blocks", val:def, target:12, unit:"SPG+BPG combined"},
+                  {label:"steals", val:score.totals.spg, target:7.0, unit:"SPG"},
+                  {label:"blocks", val:score.totals.bpg, target:5.0, unit:"BPG"},
                 ];
                 const weakest = scores.reduce((a,b) => (a.val/a.target < b.val/b.target) ? a : b);
                 const pct = Math.round((weakest.val/weakest.target)*100);
