@@ -14,7 +14,7 @@ const HOF_PLAYERS = new Set([
   "Tiny Archibald","Elvin Hayes","Dave Cowens","Bob McAdoo","George Gervin",
   "Isiah Thomas","Dominique Wilkins","Gary Payton","Jason Kidd","Reggie Miller",
   "Scottie Pippen","Dennis Rodman","Bob Pettit","Lenny Wilkens","Walt Frazier",
-  "Nate Thurmond","Bob Lanier","Dave Bing","Bob Dandridge","Gail Goodrich",
+  "Nate Thurmond","Bob Lanier","Dave Bing","Bob Dandridge","Gail Goodrich","Bernard King",
 ]);
 
 const PLAYERS_RAW = [
@@ -2667,7 +2667,11 @@ const UNCOMMON_FRANCHISES = new Set(["Washington Wizards|1960s",
   "Minnesota Timberwolves|1990s",
   "Phoenix Suns|2010s",
   "Phoenix Suns|2020s",
-  "Los Angeles Clippers|2010s"
+  "Los Angeles Clippers|2010s",
+  "Atlanta Hawks|1960s",
+  "Brooklyn Nets|1970s",
+  "Los Angeles Lakers|2010s",
+  "New York Knicks|1980s"
 ]);
 
 function getFranchiseWeight(team, decade) {
