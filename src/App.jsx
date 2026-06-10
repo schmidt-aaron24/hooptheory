@@ -2826,6 +2826,7 @@ export default function HoopTheory(){
   const [profile,setProfile]=useState(null);
   const [recentGames,setRecentGames]=useState([]);
   const [showBestTeam,setShowBestTeam]=useState(false);
+  const [usernameMsg,setUsernameMsg]=useState("");
   const [showMenu,setShowMenu]=useState(false);
   const [showPrivacy,setShowPrivacy]=useState(false);
   const [profileTab,setProfileTab]=useState("profile");
@@ -3270,12 +3271,20 @@ export default function HoopTheory(){
                   <button onClick={async()=>{
                     const val = document.getElementById("username-input").value.trim();
                     if(!val) return;
-                    const {data} = await supabase.from('profiles').update({username:val}).eq('id',user.id).select().single();
-                    if(data) setProfile(data);
+                    setUsernameMsg("");
+                    const {data, error} = await supabase.from('profiles').update({username:val}).eq('id',user.id).select().single();
+                    if(error && error.code === '23505') {
+                      setUsernameMsg("That username is taken. Try another.");
+                    } else if(data) {
+                      setProfile(data);
+                      setUsernameMsg("Saved!");
+                      setTimeout(()=>setUsernameMsg(""), 2000);
+                    }
                   }} style={{background:"#f4a426",border:"none",borderRadius:10,padding:"10px 16px",color:"#000",fontSize:12,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>
                     SAVE
                   </button>
                 </div>
+                {usernameMsg&&<div style={{fontSize:12,marginBottom:8,color:usernameMsg==="Saved!"?"#4ade80":"#f87171"}}>{usernameMsg}</div>}
 
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:20}}>
                   {[
