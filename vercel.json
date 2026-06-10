@@ -1,7 +1,9 @@
 {
-  "rewrites": [
-    { "source": "/api/share-image", "destination": "/api/share-image/index.js" },
-    { "source": "/share/:id", "destination": "/api/share/[id].js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/share-image", "dest": "/api/share-image/index.js" },
+    { "src": "/share/([^/]+)", "dest": "/api/share/[id].js?id=$1" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
