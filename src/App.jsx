@@ -2836,6 +2836,7 @@ export default function HoopTheory(){
   const [showAuth,setShowAuth]=useState(false);
   const [authEmail,setAuthEmail]=useState("");
   const [authPassword,setAuthPassword]=useState("");
+  const [showPassword,setShowPassword]=useState(false);
   const [authMode,setAuthMode]=useState("password");
   const [authMsg,setAuthMsg]=useState("");
 
@@ -3128,13 +3129,18 @@ export default function HoopTheory(){
                   style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:10,outline:"none",boxSizing:"border-box"}}
                 />
                 {(authMode==="password"||authMode==="signup")&&(
-                  <input
-                    type="password"
-                    placeholder={authMode==="signup"?"Create a password":"Password"}
-                    value={authPassword||""}
-                    onChange={e=>setAuthPassword(e.target.value)}
-                    style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,marginBottom:10,outline:"none",boxSizing:"border-box"}}
-                  />
+                  <div style={{position:"relative",marginBottom:10}}>
+                    <input
+                      type={showPassword?"text":"password"}
+                      placeholder={authMode==="signup"?"Create a password":"Password"}
+                      value={authPassword||""}
+                      onChange={e=>setAuthPassword(e.target.value)}
+                      style={{width:"100%",background:"#0f1923",border:"1px solid #2a3a4a",borderRadius:12,padding:"12px 44px 12px 16px",color:"#fff",fontSize:14,outline:"none",boxSizing:"border-box"}}
+                    />
+                    <button onClick={()=>setShowPassword(p=>!p)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"#8899aa",cursor:"pointer",fontSize:16,padding:0}}>
+                      {showPassword?"🙈":"👁️"}
+                    </button>
+                  </div>
                 )}
                 <button onClick={async()=>{
                   if(!authEmail) return;
