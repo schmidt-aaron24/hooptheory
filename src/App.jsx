@@ -2721,7 +2721,7 @@ function scoreTeam(roster) {
 
   const ppgMod = t.ppg * assistMult;
   const eliteCount = [
-    ppgMod >= 130,
+    ppgMod >= 120,
     t.rpg >= 40,
     t.apg >= 23,
     (t.spg + t.bpg) >= 12,
@@ -3415,8 +3415,8 @@ export default function HoopTheory(){
               ["SCORING: REBOUNDS & DEFENSE","Rebounds count fully up to 50 RPG. Steals and blocks carry 3x weight — a lockdown defender contributes far more than their raw numbers suggest."],
               ["BIG NAMES \u2260 WINS","Oscar Robertson, Michael Jordan, and Shaquille O'Neal on the same team might only win 63 games if their rebounds, assists, steals and blocks don't hold up. The engine only sees the numbers \u2014 not the names."],
               ["HALL OF FAME BONUS","3 HOFers = +2 wins. 4 HOFers = +4 wins. 5 HOFers = +6 wins."],
-              ["ELITE BALANCE BONUS","Hit 3 elite categories = +2 wins. Hit 4 = +4 wins. Elite thresholds: 130+ PPG · 40+ RPG · 23+ APG · 12+ SPG+BPG. Reward for true balance."],
-              ["PATHS TO 82-0","🔥 SCORER'S PATH: Historic PPG (130+) with elite assists. Stack scorers but don't neglect your playmaker. ⚖️ BALANCED ELITE: Hit 3+ elite categories — 130+ PPG, 40+ RPG, 23+ APG, or 12+ SPG+BPG. The balance bonus rewards this. 🛡️ DEFENSIVE ANCHOR: Elite steals+blocks (12+) carry extra weight. Two-way players can overperform their PPG. ☠️ WHAT KILLS EVERY TEAM: Ignoring assists. Under 19 APG penalizes your scoring no matter how high it is."],
+              ["ELITE BALANCE BONUS","Hit 3 elite categories = +2 wins. Hit 4 = +4 wins. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 12+ SPG+BPG. Reward for true balance."],
+              ["PATHS TO 82-0","🔥 SCORER'S PATH: Historic PPG (130+) with elite assists. Stack scorers but don't neglect your playmaker. ⚖️ BALANCED ELITE: Hit 3+ elite categories — 120+ PPG, 40+ RPG, 23+ APG, or 12+ SPG+BPG. The balance bonus rewards this. 🛡️ DEFENSIVE ANCHOR: Elite steals+blocks (12+) carry extra weight. Two-way players can overperform their PPG. ☠️ WHAT KILLS EVERY TEAM: Ignoring assists. Under 19 APG penalizes your scoring no matter how high it is."],
               ["THE WIN CURVE","82-0 requires near-perfect balance across most categories. You can have one weakness if everything else is exceptional \u2014 but you cannot coast on a single dominant stat."],
               ["FRANCHISE NAMES","All teams use their modern franchise name regardless of era. The 1970s Sacramento Kings are the old Kansas City-Omaha Kings. The 1990s Oklahoma City Thunder are the old Seattle SuperSonics. The 1960s Golden State Warriors are the old Philadelphia and San Francisco Warriors. Same franchise, different city — the players and stats reflect that specific era."],
               ["DEFENSIVE STATS & ERAS","Blocks and steals weren't officially tracked until 1973-74. For 1960s players, positional averages are used — Centers get ~2.5 BPG, Power Forwards ~1.5, and so on. This means drafting Wilt Chamberlain or Bill Russell isn't a defensive liability — their era just couldn't measure what they actually did. For 1970s players, individual estimates based on early tracking data and historical reputation are used. You can strategize around this: a 1960s Center with estimated blocks is still a defensive anchor, just not as precisely measured as a modern player."],
