@@ -2733,7 +2733,7 @@ function scoreTeam(roster) {
   ].filter(Boolean).length;
   const eliteBonus = eliteCount>=5?8 : eliteCount>=4?6 : eliteCount>=3?4 : eliteCount>=2?2 : 0;
 
-  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/255, 1.125)));
+  const rawWins = Math.min(82, Math.round(82*Math.pow(raw/252, 1.125)));
   const wins = Math.min(82, rawWins+hofBonus+eliteBonus);
   const losses = 82-wins;
   const grade = wins>=82?"S":wins>=70?"A":wins>=60?"B":wins>=50?"C":wins>=40?"D":"F";
