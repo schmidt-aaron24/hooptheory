@@ -1599,7 +1599,7 @@ const PLAYERS_RAW = [
   ["Luol Deng","Chicago Bulls","CHI","2000s","SF|SG",14.8,5.8,2.4,1.2,0.6],
   ["Ben Gordon","Chicago Bulls","CHI","2000s","SG|PG",17.4,2.8,3.4,1.0,0.2],
   ["Kirk Hinrich","Chicago Bulls","CHI","2000s","PG|SG",13.4,3.4,5.4,1.4,0.4],
-  ["Dwyane Wade","Chicago Bulls","CHI","2000s","PG|SG",18.3,4.4,4.4,1.8,0.8],
+
   ["Andres Nocioni","Chicago Bulls","CHI","2000s","SF|PF",11.4,5.4,2.4,1.0,0.6],
   ["Chris Duhon","Chicago Bulls","CHI","2000s","PG",7.4,2.8,5.4,1.2,0.2],
   ["Tyson Chandler","Chicago Bulls","CHI","2000s","C",8.4,10.4,1.4,0.8,1.4],
