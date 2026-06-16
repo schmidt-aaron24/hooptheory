@@ -2673,7 +2673,13 @@ const UNCOMMON_FRANCHISES = new Set(["Washington Wizards|1960s",
   "Los Angeles Lakers|2010s",
   "New York Knicks|1980s",
   "Orlando Magic|2000s",
-  "Detroit Pistons|1970s"
+  "Detroit Pistons|1970s",
+  "Utah Jazz|1970s",
+  "Boston Celtics|1970s",
+  "Houston Rockets|1970s",
+  "Boston Celtics|1990s",
+  "Boston Celtics|2010s",
+  "Cleveland Cavaliers|1970s"
 ]);
 
 function getFranchiseWeight(team, decade) {
