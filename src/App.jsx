@@ -435,7 +435,7 @@ const PLAYERS_RAW = [
   ["Domantas Sabonis","Sacramento Kings","SAC","2020s","C|PF",18.8,11.4,6.6,1.1,0.5],
   ["De'Aaron Fox","Sacramento Kings","SAC","2020s","PG|SG",24.2,4.1,6.6,1.5,0.4],
   ["Kevin Huerter","Sacramento Kings","SAC","2020s","SG|SF",14.9,4.2,3.5,0.9,0.3],
-  ["Keegan Murray","Sacramento Kings","SAC","2020s","SF|PF",15.3,4.6,1.7,0.7,0.4],
+  ["Keegan Murray","Sacramento Kings","SAC","2020s","SF|PF",15.3,5.7,1.7,0.9,1.0],
   ["Harrison Barnes","Sacramento Kings","SAC","2020s","SF|PF",14.5,5.5,2.3,0.7,0.4],
   ["Tyrese Haliburton","Indiana Pacers","IND","2020s","PG",19.4,3.5,9.8,1.4,0.4],
   ["Pascal Siakam","Indiana Pacers","IND","2020s","PF|SF",20.8,7.2,3.4,0.9,0.5],
