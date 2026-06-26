@@ -8,9 +8,8 @@ const HOF_PLAYERS = new Set([
   "Magic Johnson","Larry Bird","Michael Jordan","Charles Barkley","Hakeem Olajuwon",
   "Patrick Ewing","Karl Malone","John Stockton","David Robinson","Clyde Drexler",
   "Shaquille O'Neal","Kobe Bryant","Tim Duncan","Kevin Garnett","Allen Iverson",
-  "Dirk Nowitzki","LeBron James","Dwyane Wade","Chris Paul","Carmelo Anthony",
-  "Steve Nash","Ray Allen","Paul Pierce","Tracy McGrady","Kevin Durant",
-  "Stephen Curry","Russell Westbrook","Nikola Jokić","Giannis Antetokounmpo",
+  "Dirk Nowitzki","Dwyane Wade","Chris Paul","Carmelo Anthony",
+  "Steve Nash","Ray Allen","Paul Pierce","Tracy McGrady",
   "Tiny Archibald","Elvin Hayes","Dave Cowens","Bob McAdoo","George Gervin",
   "Isiah Thomas","Dominique Wilkins","Gary Payton","Jason Kidd","Reggie Miller",
   "Scottie Pippen","Dennis Rodman","Bob Pettit","Lenny Wilkens","Walt Frazier",
@@ -2681,7 +2680,8 @@ const UNCOMMON_FRANCHISES = new Set(["Washington Wizards|1960s",
   "Boston Celtics|2010s",
   "Cleveland Cavaliers|1970s",
   "Oklahoma City Thunder|1960s",
-  "Houston Rockets|2000s"
+  "Houston Rockets|2000s",
+  "Los Angeles Clippers|1960s"
 ]);
 
 function getFranchiseWeight(team, decade) {
