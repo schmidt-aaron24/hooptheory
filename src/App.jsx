@@ -2359,7 +2359,7 @@ const PLAYERS_RAW = [
   ["Daniel Theis","Boston Celtics","BOS","2010s","C|PF",9.4,6.4,1.8,0.6,1.2],
   ["Kevin Loughery","Brooklyn Nets","BKN","1970s","SG|PG",12.4,3.4,4.4,1.4,0.2],
   ["Super John Williamson","Brooklyn Nets","BKN","1970s","SG",18.4,3.4,3.4,1.6,0.2],
-  ["Deron Williams","Brooklyn Nets","BKN","1980s","PG",19.4,3.4,7.4,1.4,0.2],
+  ["Deron Williams","Brooklyn Nets","BKN","2010s","PG",19.4,3.4,7.4,1.4,0.2],
   ["Joe Johnson","Brooklyn Nets","BKN","1980s","SG|SF",16.4,4.4,3.4,1.0,0.3],
   ["Reggie Evans","Brooklyn Nets","BKN","1980s","PF|C",5.4,9.4,1.4,0.8,0.4],
   ["Gerald Wallace","Brooklyn Nets","BKN","1980s","SF|SG",14.4,7.4,2.8,2.0,1.2],
