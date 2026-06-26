@@ -3240,7 +3240,7 @@ export default function HoopTheory(){
                   setProfileTab(tab);
                   if(tab==="leaderboard" && leaderboard.length===0){
                     setLbLoading(true);
-                    const {data} = await supabase.from('leaderboard').select('*').limit(50);
+                    const {data} = await supabase.from('leaderboard').select('*').gt('best_wins',0).limit(50);
                     if(data) setLeaderboard(data);
                     setLbLoading(false);
                   }
