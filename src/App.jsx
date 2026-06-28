@@ -17,7 +17,7 @@ const HOF_PLAYERS = new Set([
 ]);
 
 const PLAYERS_RAW = [
-  ["Wilt Chamberlain","Golden State Warriors","GSW","1960s","C",37.6,22.9,2.3,1.2,4.2],
+  ["Wilt Chamberlain","Golden State Warriors","GSW","1960s","C",32.0,20.0,2.3,1.2,3.0],
   ["Paul Arizin","Golden State Warriors","GSW","1960s","SF|SG",26.4,9.0,2.3,1.2,0.6],
   ["Tom Gola","Golden State Warriors","GSW","1960s","SG|PG",14.7,9.4,5.6,1.4,0.2],
   ["Guy Rodgers","Golden State Warriors","GSW","1960s","PG",18.3,5.7,11.2,1.2,0.1],
@@ -35,7 +35,7 @@ const PLAYERS_RAW = [
   ["Bailey Howell","Boston Celtics","BOS","1960s","PF|SF",19.8,9.4,2.2,1.0,1.0],
   ["Jerry West","Los Angeles Lakers","LAL","1960s","PG|SG",27.0,4.8,6.6,1.2,0.1],
   ["Elgin Baylor","Los Angeles Lakers","LAL","1960s","SF|PF",30.6,14.9,4.1,1.2,0.6],
-  ["Wilt Chamberlain","Los Angeles Lakers","LAL","1960s","C",27.0,18.3,4.1,1.2,4.2],
+  ["Wilt Chamberlain","Los Angeles Lakers","LAL","1960s","C",27.0,17.0,4.1,1.2,3.0],
   ["Gail Goodrich","Los Angeles Lakers","LAL","1960s","PG|SG",23.8,5.4,6.4,1.2,0.1],
   ["Happy Hairston","Los Angeles Lakers","LAL","1960s","PF|C",15.3,13.7,1.8,1.0,1.0],
   ["Oscar Robertson","Sacramento Kings","SAC","1960s","PG|SG",29.3,10.8,10.0,1.2,0.1],
@@ -48,7 +48,7 @@ const PLAYERS_RAW = [
   ["Dick Barnett","New York Knicks","NYK","1960s","SG|PG",20.0,3.4,3.1,1.4,0.2],
   ["Dave DeBusschere","New York Knicks","NYK","1960s","PF|SF",16.3,13.5,2.5,1.0,1.0],
   ["Bill Bradley","New York Knicks","NYK","1960s","SF|SG",12.4,3.6,3.7,1.2,0.6],
-  ["Wilt Chamberlain","Philadelphia 76ers","PHI","1960s","C",33.5,24.2,4.4,1.2,4.2],
+  ["Wilt Chamberlain","Philadelphia 76ers","PHI","1960s","C",30.0,21.0,4.4,1.2,3.0],
   ["Hal Greer","Philadelphia 76ers","PHI","1960s","SG|PG",20.3,4.8,3.8,1.4,0.2],
   ["Billy Cunningham","Philadelphia 76ers","PHI","1960s","SF|PF",19.2,10.2,3.8,1.2,1.0],
   ["Chet Walker","Philadelphia 76ers","PHI","1960s","SF|SG",22.0,8.1,2.7,1.2,0.6],
@@ -2745,7 +2745,7 @@ function scoreTeam(roster) {
     t.rpg >= 40,
     t.apg >= 23,
     t.spg >= 7.0,
-    t.bpg >= 5.0,
+    t.bpg >= 6.0,
   ].filter(Boolean).length;
   const eliteBonus = eliteCount>=5?8 : eliteCount>=4?6 : eliteCount>=3?4 : eliteCount>=2?2 : 0;
 
@@ -3451,7 +3451,7 @@ export default function HoopTheory(){
               ["SCORING: REBOUNDS & DEFENSE","Rebounds count fully up to 50 RPG. Steals and blocks carry 3x weight — a lockdown defender contributes far more than their raw numbers suggest."],
               ["BIG NAMES \u2260 WINS","Oscar Robertson, Michael Jordan, and Shaquille O'Neal on the same team might only win 63 games if their rebounds, assists, steals and blocks don't hold up. The engine only sees the numbers \u2014 not the names."],
               ["HALL OF FAME BONUS","2 HOFers = +1 win. 3 HOFers = +2 wins. 4 HOFers = +4 wins. 5 HOFers = +6 wins."],
-              ["ELITE BALANCE BONUS","Hit 2 elite categories = +2 wins. 3=+4. 4=+6. 5=+8. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 7+ SPG · 5+ BPG. Steals and blocks now count separately — you need a ball hawk AND a shot blocker."],
+              ["ELITE BALANCE BONUS","Hit 2 elite categories = +2 wins. 3=+4. 4=+6. 5=+8. Elite thresholds: 120+ PPG · 40+ RPG · 23+ APG · 7+ SPG · 6+ BPG. Steals and blocks now count separately — you need a ball hawk AND a shot blocker."],
               ["PATHS TO 82-0","🔥 SCORER'S PATH: Historic PPG (130+) with elite assists. Stack scorers but don't neglect your playmaker. ⚖️ BALANCED ELITE: Hit 3+ elite categories — 120+ PPG, 40+ RPG, 23+ APG, or 12+ SPG+BPG. The balance bonus rewards this. 🛡️ DEFENSIVE ANCHOR: Elite steals+blocks (12+) carry extra weight. Two-way players can overperform their PPG. ☠️ WHAT KILLS EVERY TEAM: Ignoring assists. Under 19 APG penalizes your scoring no matter how high it is."],
               ["THE WIN CURVE","82-0 requires near-perfect balance across most categories. You can have one weakness if everything else is exceptional \u2014 but you cannot coast on a single dominant stat."],
               ["FRANCHISE NAMES","All teams use their modern franchise name regardless of era. The 1970s Sacramento Kings are the old Kansas City-Omaha Kings. The 1990s Oklahoma City Thunder are the old Seattle SuperSonics. The 1960s Golden State Warriors are the old Philadelphia and San Francisco Warriors. Same franchise, different city — the players and stats reflect that specific era."],
@@ -3664,7 +3664,7 @@ export default function HoopTheory(){
                   note={score.totals.rpg>50?`raw ${score.totals.rpg.toFixed(1)}`:null}/>
                 <StatBar label="APG" value={score.totals.apg} max={40} color="#a78bfa"/>
                 <StatBar label={`SPG (×3 weight)${score.totals.spg>=7.0?" ⭐":""}`} value={score.totals.spg} max={15} color="#f4a426"/>
-                <StatBar label={`BPG (×3 weight)${score.totals.bpg>=5.0?" ⭐":""}`} value={score.totals.bpg} max={15} color="#fb923c"/>
+                <StatBar label={`BPG (×3 weight)${score.totals.bpg>=6.0?" ⭐":""}`} value={score.totals.bpg} max={15} color="#fb923c"/>
               </div>
 
               <div style={{background:"#0a1520",border:"1px solid #1a2535",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
@@ -3677,7 +3677,7 @@ export default function HoopTheory(){
                 const spgEl = spg >= 7.0;
                 const bpgEl = bpg >= 5.0;
                 if(spgEl && bpgEl) return <div style={{color:"#4ade80",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite defense — {spg.toFixed(1)} SPG ⭐ + {bpg.toFixed(1)} BPG ⭐. This team locks down opponents.</div>;
-                if(spgEl) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite ball hawks — {spg.toFixed(1)} SPG ⭐. Add a shot blocker (5+ BPG) for full defensive elite.</div>;
+                if(spgEl) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite ball hawks — {spg.toFixed(1)} SPG ⭐. Add a shot blocker (6+ BPG) for full defensive elite.</div>;
                 if(bpgEl) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Elite shot blocking — {bpg.toFixed(1)} BPG ⭐. Add a ball hawk (7+ SPG) for full defensive elite.</div>;
                 if(spg+bpg >= 9.5) return <div style={{color:"#60a5fa",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Strong defensive team — {spg.toFixed(1)} SPG + {bpg.toFixed(1)} BPG.</div>;
                 if(spg+bpg >= 7.5) return <div style={{color:"#94b4c8",fontSize:12,marginBottom:8,lineHeight:1.6}}>🛡️ Solid defense — {spg.toFixed(1)} SPG + {bpg.toFixed(1)} BPG. Room to improve.</div>;
