@@ -2701,21 +2701,18 @@ function getFranchiseWeight(team, decade) {
 }
 
 function rollSlot() {
-  // Pick decade with equal probability first (prevents 1970s from dominating
-  // just because it has more franchises than other decades)
-  const decades = getDecades();
-  const decade = decades[Math.floor(Math.random() * decades.length)];
-  // Then pick weighted team within that decade
-  const teams = getTeamsForDecade(decade);
-  const weightedTeams = [];
-  teams.forEach(team => {
-    const weight = getFranchiseWeight(team, decade);
-    for (let i = 0; i < weight; i++) {
-      weightedTeams.push(team);
-    }
+  // Build one global weighted pool of all franchise/decade combos
+  // This ensures true global rarity — Rare is always ~3.7% regardless of decade
+  const allCombos = [];
+  getDecades().forEach(decade => {
+    getTeamsForDecade(decade).forEach(team => {
+      const weight = getFranchiseWeight(team, decade);
+      for (let i = 0; i < weight; i++) {
+        allCombos.push({ team, decade });
+      }
+    });
   });
-  const team = weightedTeams[Math.floor(Math.random() * weightedTeams.length)];
-  return { team, decade };
+  return allCombos[Math.floor(Math.random() * allCombos.length)];
 }
 
 function getEligibleOpenSlots(player, roster, excludeIdx=-1) {
